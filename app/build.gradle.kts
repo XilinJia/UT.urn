@@ -19,7 +19,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
     }
 
 //    sourceSets {
@@ -60,6 +60,29 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+}
+
+androidComponents {
+    val appName = "UT.urn"
+    val versionName = android.defaultConfig.versionName ?: "0.0.0"
+    onVariants { variant ->
+        val variantName = variant.name
+        val capitalized = variantName.replaceFirstChar { it.uppercase() }
+        val copyTask = tasks.register<Copy>("export${capitalized}Apks") {
+            from(variant.artifacts.get(com.android.build.api.artifact.SingleArtifact.APK)) {
+                include("**/*.apk")
+                eachFile {
+                    name = name
+                        .replace(Regex("-(release|debug)(?=\\.apk$)"), "")
+                        .replace("app", appName)
+                        .replace(".apk", "-$versionName.apk")
+                }
+                into("")
+            }
+            into(layout.buildDirectory.dir("exported-apks/$variantName"))
+        }
+        tasks.matching { it.name == "assemble$capitalized" }.configureEach { finalizedBy(copyTask) }
     }
 }
 
