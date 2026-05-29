@@ -79,8 +79,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            app/build/exported-apks/freeRelease/*.apk
-            app/build/exported-apks/playRelease/*.apk
+            app/build/exported-apks/release/*.apk
           name: "Release ${{ github.ref_name }}"
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
