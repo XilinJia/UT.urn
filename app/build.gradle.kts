@@ -34,10 +34,24 @@ android {
         aidl = true
     }
 
+    signingConfigs {
+        create("releaseConfig") {
+            enableV1Signing = true
+            enableV2Signing = true
+            storeFile = file(project.findProperty("releaseStoreFile") as? String ?: "keystore")
+            storePassword = project.findProperty("releaseStorePassword") as? String ?: "password"
+            keyAlias = project.findProperty("releaseKeyAlias") as? String ?:  "alias"
+            keyPassword = project.findProperty("releaseKeyPassword") as? String ?:  "password"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs["releaseConfig"]
         }
     }
     compileOptions {
