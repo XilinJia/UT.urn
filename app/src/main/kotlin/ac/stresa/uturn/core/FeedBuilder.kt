@@ -2,7 +2,6 @@ package ac.stresa.uturn.core
 
 import ac.mdiq.podcini.shared.EpisodeIPC
 import ac.mdiq.podcini.shared.FeedIPC
-import ac.mdiq.podcini.shared.FeedType
 import ac.mdiq.podcini.shared.getEntityId
 import ac.mdiq.podcini.shared.prepareUrl
 import android.util.Log
@@ -46,7 +45,7 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
 //        feed_.isBuilding = true
         feedId = getEntityId()
         feed_.id = feedId
-        feed_.type = FeedType.YOUTUBE.name
+        feed_.type = FEEDTYPE
         feed_.hasVideoMedia = true
         feed_.prefStreamOverDownload = true
         feed_.autoDownload = false
@@ -172,6 +171,8 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
 
     companion object {
         const val EPISODES_LIMIT = 3000
+
+        const val FEEDTYPE = "YouTube"
 
         internal fun episodeFrom(item: StreamInfoItem): EpisodeIPC {
             val e = EpisodeIPC()

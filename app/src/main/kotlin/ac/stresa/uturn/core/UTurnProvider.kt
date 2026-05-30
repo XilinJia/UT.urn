@@ -4,11 +4,11 @@ import ac.mdiq.podcini.sources.Provider
 import ac.mdiq.podcini.shared.AudioSpec
 import ac.mdiq.podcini.shared.EpisodeIPC
 import ac.mdiq.podcini.shared.FeedIPC
-import ac.mdiq.podcini.shared.FeedType
 import ac.mdiq.podcini.shared.ShareType
 import ac.mdiq.podcini.shared.VideoSpec
 import ac.mdiq.podcini.shared.prepareUrl
 import ac.stresa.uturn.core.FeedBuilder.Companion.EPISODES_LIMIT
+import ac.stresa.uturn.core.FeedBuilder.Companion.FEEDTYPE
 import ac.stresa.uturn.core.FeedBuilder.Companion.episodeFrom
 import ac.stresa.uturn.core.util.InfoCache
 import android.util.Log
@@ -34,6 +34,8 @@ import java.net.URL
 
 class UTurnProvider: Provider.Stub() {
     private val CACHE: InfoCache = InfoCache.instance
+
+    override fun feedType(): String = FEEDTYPE
 
     override fun haveMultiQualities(): Boolean = true
 
@@ -216,7 +218,7 @@ class UTurnProvider: Provider.Stub() {
         fun setupFeed(channelInfo: ChannelInfo): FeedIPC {
             val feed_ = FeedIPC()
             feed_.downloadUrl = url
-            feed_.type = FeedType.YOUTUBE.name
+            feed_.type = FEEDTYPE
             feed_.hasVideoMedia = true
             feed_.title = channelInfo.name
             feed_.description = channelInfo.description
@@ -294,7 +296,7 @@ class UTurnProvider: Provider.Stub() {
                 }
                 feed_ = FeedIPC()
                 feed_.downloadUrl = url
-                feed_.type = FeedType.YOUTUBE.name
+                feed_.type = FEEDTYPE
                 feed_.hasVideoMedia = true
                 feed_.title = playlistInfo.name
                 feed_.description = playlistInfo.description?.content ?: ""

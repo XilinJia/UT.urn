@@ -18,8 +18,8 @@ android {
         applicationId = "ac.stresa.uturn"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
 
 //    sourceSets {
@@ -107,7 +107,7 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:3.5.0")
     implementation("io.ktor:ktor-utils:3.5.0")
 
-    implementation("com.github.XilinJia:PodciniLib:1.0.1")
+    implementation("com.github.XilinJia:PodciniLib:1.0.2")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.5")
     implementation("com.github.teamnewpipe:NewPipeExtractor:v0.26.2")
