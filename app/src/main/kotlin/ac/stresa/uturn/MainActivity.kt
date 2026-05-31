@@ -14,13 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             PodciniProviderTheme {
                 Box(modifier = Modifier.background(Color.Black).fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Podcini Test Provider Installed", color = Color.Red)
+                    Text("UT.urn Installed", color = Color.Red)
                 }
             }
         }

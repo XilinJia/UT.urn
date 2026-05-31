@@ -65,14 +65,6 @@ class UTurnProvider: Provider.Stub() {
         return getStreamInfo(url)?.description?.content
     }
 
-    override fun isFeedAutoDownloadable(urlString: String): Boolean {
-        val url = try { URL(urlString) } catch (e: Exception) {
-            Log.e(TAG, "isFeedAutoDownloadable url wrong format: $urlString")
-            return false
-        }
-        return !YoutubeParsingHelper.isYoutubeURL(url)
-    }
-
     override fun searcherTAG(): String = "YouTube search"
 
     override fun canHandleSharedMedia(urlString: String): Boolean {
@@ -360,7 +352,7 @@ class UTurnProvider: Provider.Stub() {
         return feed_
     }
 
-    override fun feedsAtUrl(url_: String): List<String> {
+    override fun feedsTitlesAtUrl(url_: String): List<String> {
         if (!isYTChannel(url_)) return listOf()
         val channelInfo = ChannelInfo.getInfo(NewPipe.getService(0), url_)
         val tabs = channelInfo.tabs
