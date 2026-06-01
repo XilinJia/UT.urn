@@ -1,8 +1,12 @@
 package ac.stresa.uturn
 
+import ac.mdiq.podcini.shared.PROVIDER_API_VERSION
+import ac.mdiq.podcini.shared.ProviderAttrs
+import ac.mdiq.podcini.shared.ShareType
 import ac.mdiq.podcini.sources.IFeedSearchProvider
 import ac.mdiq.podcini.sources.IPodciniGateway
 import ac.mdiq.podcini.sources.Provider
+import ac.stresa.uturn.core.FeedBuilder.Companion.FEEDTYPE
 import ac.stresa.uturn.core.Localization.Companion.getPreferredContentCountry
 import ac.stresa.uturn.core.Localization.Companion.getPreferredLocalization
 import ac.stresa.uturn.core.UTurnProvider
@@ -25,6 +29,18 @@ class GatewayService : Service() {
     private val searchProviderBinder = VistaGuideSearcher()
     private val uturnProviderBinder = UTurnProvider()
     private val gatewayBinder = object : IPodciniGateway.Stub() {
+        override fun getAttributes(): ProviderAttrs {
+            return ProviderAttrs(
+                name = "UT.urn",
+                apiVersion = PROVIDER_API_VERSION,
+                feedType = FEEDTYPE,
+                hasMultiQualities = true,
+                hasViewCount = true,
+                hasLikeCount = true,
+                searcherTAG = "YouTube search",
+                shareLogType = ShareType.YTMedia.name,
+                feedDomains = listOf("youtube", "youtu.be"))
+        }
         override fun getSearchProvider(): IFeedSearchProvider {
             return searchProviderBinder
         }

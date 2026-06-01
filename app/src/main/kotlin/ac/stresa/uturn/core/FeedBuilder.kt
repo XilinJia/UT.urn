@@ -48,6 +48,7 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
         feed_.type = FEEDTYPE
         feed_.hasVideoMedia = true
         feed_.prefStreamOverDownload = true
+        feed_.episodesDownloadable = false
         feed_.autoDownload = false
         return feed_
     }

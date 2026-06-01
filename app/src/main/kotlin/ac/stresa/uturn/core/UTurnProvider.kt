@@ -1,12 +1,11 @@
 package ac.stresa.uturn.core
 
-import ac.mdiq.podcini.sources.Provider
 import ac.mdiq.podcini.shared.AudioSpec
 import ac.mdiq.podcini.shared.EpisodeIPC
 import ac.mdiq.podcini.shared.FeedIPC
-import ac.mdiq.podcini.shared.ShareType
 import ac.mdiq.podcini.shared.VideoSpec
 import ac.mdiq.podcini.shared.prepareUrl
+import ac.mdiq.podcini.sources.Provider
 import ac.stresa.uturn.core.FeedBuilder.Companion.EPISODES_LIMIT
 import ac.stresa.uturn.core.FeedBuilder.Companion.FEEDTYPE
 import ac.stresa.uturn.core.FeedBuilder.Companion.episodeFrom
@@ -35,10 +34,6 @@ import java.net.URL
 class UTurnProvider: Provider.Stub() {
     private val CACHE: InfoCache = InfoCache.instance
 
-    override fun feedType(): String = FEEDTYPE
-
-    override fun haveMultiQualities(): Boolean = true
-
     override fun canHandleUrl(url_: String): Boolean {
         val url = try { URL(url_) } catch (e: Exception) { return false }
         return (YoutubeParsingHelper.isYoutubeURL(url) && url.path.startsWith("/watch")) || YoutubeParsingHelper.isYoutubeServiceURL(url)
@@ -48,9 +43,6 @@ class UTurnProvider: Provider.Stub() {
         val url = try { URL(url_) } catch (e: Exception) { return false }
         return YoutubeParsingHelper.isYoutubeURL(url) || YoutubeParsingHelper.isYoutubeServiceURL(url)
     }
-
-    override fun haveViewCount(): Boolean = true
-    override fun haveLikeCount(): Boolean = true
 
     override fun buildEpisode(url: String): EpisodeIPC? {
         val info = StreamInfo.getInfo(NewPipe.getService(0), url)
@@ -65,20 +57,12 @@ class UTurnProvider: Provider.Stub() {
         return getStreamInfo(url)?.description?.content
     }
 
-    override fun searcherTAG(): String = "YouTube search"
-
     override fun canHandleSharedMedia(urlString: String): Boolean {
         val url = try { URL(urlString) } catch (e: Exception) {
             Log.e(TAG, "canHandleSharedMedia url wrong format: $urlString")
             return false
         }
         return (YoutubeParsingHelper.isYoutubeURL(url) && (url.path.startsWith("/watch") || url.path.startsWith("/live"))) || YoutubeParsingHelper.isYoutubeServiceURL(url)
-    }
-
-    override fun getShareLogType(): String? = ShareType.YTMedia.name
-
-    override fun feedDomains(): List<String> {
-        return listOf("youtube", "youtu.be")
     }
 
     override fun getAudioSpecs(media: EpisodeIPC): List<AudioSpec> {
