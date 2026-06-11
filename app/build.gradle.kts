@@ -9,17 +9,17 @@ kotlin { jvmToolchain(21) }
 android {
     namespace = "ac.stresa.uturn"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
+        version = release(37) {
+            minorApiLevel = 0
         }
     }
 
     defaultConfig {
         applicationId = "ac.stresa.uturn"
         minSdk = 26
-        targetSdk = 36
-        versionCode = 4
-        versionName = "1.0.3"
+        targetSdk = 37
+        versionCode = 5
+        versionName = "1.0.4"
     }
 
 //      sourceSets {
@@ -88,7 +88,7 @@ androidComponents {
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
-    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
@@ -96,21 +96,21 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    implementation("androidx.webkit:webkit:1.16.0")
+    implementation(libs.androidx.webkit)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.datetime)
 
-    implementation("io.ktor:ktor-http:3.5.0")
-    implementation("io.ktor:ktor-client-core:3.5.0")
-    implementation("io.ktor:ktor-client-okhttp:3.5.0")
-    implementation("io.ktor:ktor-client-cio:3.5.0")
-    implementation("io.ktor:ktor-utils:3.5.0")
+    implementation(libs.ktor.http)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.utils)
 
-    implementation("com.github.XilinJia:PodciniLib:1.0.4")
+    implementation("com.github.XilinJia:PodciniLib:1.0.5")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.5")
-    implementation("com.github.teamnewpipe:NewPipeExtractor:v0.26.2")
+    implementation("com.github.teamnewpipe:NewPipeExtractor:v0.26.3")
     implementation("com.github.TeamNewPipe:nanojson:e9d656ddb49a412a5a0a5d5ef20ca7ef09549996")
     implementation("io.reactivex.rxjava3:rxjava:3.1.12")
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")

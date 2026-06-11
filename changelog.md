@@ -1,3 +1,8 @@
+# 1.0.4
+
+* extractor upped to 0.26.3, with separate audio streams re-enabled
+* Kotlin upped to 2.4.0
+
 # 1.0.3
 
 * PodciniLib upped to 1.0.4
