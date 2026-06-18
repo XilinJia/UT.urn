@@ -18,8 +18,8 @@ android {
         applicationId = "ac.stresa.uturn"
         minSdk = 26
         targetSdk = 37
-        versionCode = 5
-        versionName = "1.0.4"
+        versionCode = 6
+        versionName = "1.0.5"
     }
 
 //      sourceSets {
@@ -52,6 +52,12 @@ android {
             isShrinkResources = true
             signingConfig = signingConfigs["releaseConfig"]
         }
+    }
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs.
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles.
+        includeInBundle = false
     }
     compileOptions {
        isCoreLibraryDesugaringEnabled = true   // for VistaGuide

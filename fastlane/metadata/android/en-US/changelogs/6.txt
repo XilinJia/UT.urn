@@ -1,0 +1,1 @@
+* added block to disable dependency metadata in build.gradle, for f-droid build

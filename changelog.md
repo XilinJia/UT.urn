@@ -1,3 +1,7 @@
+# 1.0.5
+
+* added block to disable dependency metadata in build.gradle, for f-droid build
+
 # 1.0.4
 
 * extractor upped to 0.26.3, with separate audio streams re-enabled
