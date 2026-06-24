@@ -9,10 +9,10 @@ ktorClientCore = "3.5.0"
 ktorClientOkhttp = "3.5.0"
 ktorHttp = "3.5.0"
 ktorUtils = "3.5.0"
-lifecycleRuntimeKtx = "2.10.0"
+lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
 kotlin = "2.4.0"
-composeBom = "2026.05.01"
+composeBom = "2026.06.00"
 webkit = "1.16.0"
 
 [libraries]

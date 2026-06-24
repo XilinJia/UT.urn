@@ -6,28 +6,19 @@ import ac.mdiq.podcini.shared.FeedIPC
 import ac.mdiq.podcini.shared.VideoSpec
 import ac.mdiq.podcini.shared.prepareUrl
 import ac.mdiq.podcini.sources.Provider
-import ac.stresa.uturn.core.FeedBuilder.Companion.EPISODES_LIMIT
-import ac.stresa.uturn.core.FeedBuilder.Companion.FEEDTYPE
 import ac.stresa.uturn.core.FeedBuilder.Companion.episodeFrom
 import ac.stresa.uturn.core.util.InfoCache
 import android.util.Log
 import io.ktor.http.Url
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toKotlinLocalDateTime
-import org.schabi.newpipe.extractor.InfoItem
 import org.schabi.newpipe.extractor.MediaFormat
 import org.schabi.newpipe.extractor.NewPipe
 import org.schabi.newpipe.extractor.channel.ChannelInfo
-import org.schabi.newpipe.extractor.channel.tabs.ChannelTabInfo
-import org.schabi.newpipe.extractor.playlist.PlaylistInfo
 import org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper
 import org.schabi.newpipe.extractor.stream.AudioStream
 import org.schabi.newpipe.extractor.stream.DeliveryMethod
 import org.schabi.newpipe.extractor.stream.StreamInfo
-import org.schabi.newpipe.extractor.stream.StreamInfoItem
 import org.schabi.newpipe.extractor.stream.VideoStream
 import java.net.URL
 
@@ -48,10 +39,6 @@ class UTurnProvider: Provider.Stub() {
         val info = StreamInfo.getInfo(NewPipe.getService(0), url)
         return episodeFrom(info)
     }
-
-//    override fun cleanData() {
-//        InfoCache.instance.trimCache()    // TODO
-//    }
 
     override fun getEpisodeDescription(url: String): String? {
         return getStreamInfo(url)?.description?.content
@@ -156,8 +143,18 @@ class UTurnProvider: Provider.Stub() {
         return v
     }
 
-    fun isYTChannel(url: String): Boolean {
-        try { return !Url(url).encodedPath.startsWith("/playlist")
+    private fun isYTChannel(url: String): Boolean {
+        try {
+            val uURL =  Url(url)
+            return uURL.encodedPath.startsWith("/channel") || uURL.encodedPath.startsWith("/@")
+        } catch (e: Exception) {
+            Log.e(TAG, "isYTChannel urlInit is not valid $url")
+            return false
+        }
+    }
+
+    private fun isYTPlaylist(url: String): Boolean {
+        try { return Url(url).encodedPath.startsWith("/playlist")
         } catch (e: Exception) {
             Log.e(TAG, "isYTChannel urlInit is not valid $url")
             return false
@@ -174,7 +171,7 @@ class UTurnProvider: Provider.Stub() {
                     fb?.channelInfo = ChannelInfo.getInfo(NewPipe.getService(0), url)
                     fb?.buildYTChannel(index, "")
                 }
-                index == 0 -> fb?.buildYTPlaylist()
+                isYTPlaylist(url) -> if (index == 0) fb?.buildYTPlaylist() else null
                 else -> null
             }
         }
@@ -185,112 +182,33 @@ class UTurnProvider: Provider.Stub() {
         return runBlocking(Dispatchers.IO) {
             when {
                 isYTChannel(fb!!.urlInit) -> fb!!.episodesFromChannel(total)
-                else -> fb!!.episodesFromList(total)
+                isYTPlaylist(fb!!.urlInit) -> fb!!.episodesFromList(total)
+                else -> listOf()
             }
         }
     }
 
-    override fun downloadFeed(url: String, lastUpdateTime: Long, fullUpdate: Boolean, limitEpisodesCount: Int): FeedIPC? {
-        fun setupFeed(channelInfo: ChannelInfo): FeedIPC {
-            val feed_ = FeedIPC()
-            feed_.downloadUrl = url
-            feed_.type = FEEDTYPE
-            feed_.hasVideoMedia = true
-            feed_.title = channelInfo.name
-            feed_.description = channelInfo.description
-            feed_.author = channelInfo.parentChannelName
-            feed_.imageUrl = if (channelInfo.avatars.isNotEmpty()) channelInfo.avatars.first().url else null
-            return feed_
-        }
+    override fun feedToUpdate(url: String): FeedIPC? {
         val service = NewPipe.getService("YouTube")
-        val uURL =  Url(url)
+        fb = FeedBuilder(url, "")
         var feed_: FeedIPC?
         when {
-            uURL.encodedPath.startsWith("/channel") || uURL.encodedPath.startsWith("/@") -> {
-                val channelInfo = ChannelInfo.getInfo(service, url)
-                Log.d(TAG, "refreshYoutubeFeed channelInfo: $channelInfo ${channelInfo.tabs.size}")
-                if (channelInfo.tabs.isEmpty()) {
-                    //                onFail(feed, "feed channelInfo is empty: ${feed.title}")  // TODO
-                    return null
-                }
-                val channelTabInfo = ChannelTabInfo.getInfo(service, channelInfo.tabs.first())
-                Log.d(TAG, "refreshYoutubeFeed result1: $channelTabInfo ${channelTabInfo.relatedItems.size}")
-                var infoItems = channelTabInfo.relatedItems
-                var nextPage = channelTabInfo.nextPage
-                val eList = mutableSetOf<EpisodeIPC>()
-                var count = 0
-                while (infoItems.isNotEmpty()) {
-                    for (r_ in infoItems) {
-                        val r = r_ as StreamInfoItem
-                        count++
-                        if (r.infoType != InfoItem.InfoType.STREAM) continue
-                        //                                Log.d(TAG, "item: ${r.uploadDate?.date()?.time} ${r.textualUploadDate} ${r.name}")
-                        if (fullUpdate || (r.uploadDate?.localDateTime?.toKotlinLocalDateTime()?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds() ?: 0) > lastUpdateTime) eList.add(episodeFrom(r))
-                        else {
-                            nextPage = null
-                            break
-                        }
-                    }
-                    if (nextPage == null || count > 2*EPISODES_LIMIT || eList.size > EPISODES_LIMIT) break
-                    if (limitEpisodesCount > 0 && count > 1.2*limitEpisodesCount) break
-                    val page = ChannelTabInfo.getMoreItems(service, channelInfo.tabs.first(), nextPage)
-                    nextPage = page.nextPage
-                    infoItems = page.items
-                    Log.d(TAG, "refreshYoutubeFeed more infoItems: ${infoItems.size} ${eList.size}")
-                }
-                feed_ = setupFeed(channelInfo)
-                feed_.episodes = eList.toMutableList()
+            isYTChannel(url) -> {
+                fb?.channelInfo = ChannelInfo.getInfo(service, url)
+                Log.d(TAG, "refreshYoutubeFeed channelInfo: ${fb?.channelInfo} ${fb?.channelInfo?.tabs?.size}")
+                runBlocking(Dispatchers.IO) { feed_ = fb?.buildYTChannel(0, "") }
             }
-            uURL.encodedPath.startsWith("/playlist") -> {
-                val playlistInfo = PlaylistInfo.getInfo(service, url)
-                if (playlistInfo == null) {
-                    //                onFail(feed, "feed playlistInfo is null: ${feed.title}")
-                    return null
-                }
-                val eList = mutableSetOf<EpisodeIPC>()
-
-                var infoItems = playlistInfo.relatedItems
-                var nextPage = playlistInfo.nextPage
-                var count = 0
-                while (infoItems.isNotEmpty()) {
-                    for (r in infoItems) {
-                        count++
-                        if (r.infoType != InfoItem.InfoType.STREAM) continue
-                        //                                Log.d(TAG, "item: ${r.uploadDate?.date()?.time} ${r.name}")
-                        if (fullUpdate || (r.uploadDate?.localDateTime?.toKotlinLocalDateTime()?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds() ?: 0) > lastUpdateTime) eList.add(episodeFrom(r))
-                        else {
-                            nextPage = null
-                            break
-                        }
-                    }
-                    if (nextPage == null || count > 2*EPISODES_LIMIT || eList.size > EPISODES_LIMIT) break
-                    if (limitEpisodesCount > 0 && count > 1.2*limitEpisodesCount) break
-                    val page = PlaylistInfo.getMoreItems(service, url, nextPage) ?: break
-                    nextPage = page.nextPage
-                    infoItems = page.items
-                    Log.d(TAG, "more infoItems: ${infoItems.size} ${eList.size}")
-                }
-                feed_ = FeedIPC()
-                feed_.downloadUrl = url
-                feed_.type = FEEDTYPE
-                feed_.hasVideoMedia = true
-                feed_.title = playlistInfo.name
-                feed_.description = playlistInfo.description?.content ?: ""
-                feed_.author = playlistInfo.uploaderName
-                feed_.imageUrl = if (playlistInfo.thumbnails.isNotEmpty()) playlistInfo.thumbnails.first().url else null
-                feed_.episodes = eList.toMutableList()
-            }
+            isYTPlaylist(url) -> runBlocking(Dispatchers.IO) { feed_ = fb?.buildYTPlaylist() }
             else -> {
                 // channel tabs other than videos
+                fb?.channelInfo = ChannelInfo.getInfo(service, url)
+                val uURL =  Url(url)
                 val pathSegments = uURL.encodedPath.split("/")
                 val channelUrl = "https://www.youtube.com/channel/${pathSegments[1]}"
                 Log.d(TAG, "channelUrl: $channelUrl")
                 val channelInfo = ChannelInfo.getInfo(service, channelUrl)
                 Log.d(TAG, "refreshYoutubeFeed channelInfo: $channelInfo ${channelInfo.tabs.size}")
-                if (channelInfo.tabs.isEmpty()) {
-                    //                onFail(feed, "feed channelInfo is empty: ${feed.title}")
-                    return null
-                }
+                if (channelInfo.tabs.isEmpty()) return null
                 var index = -1
                 for (i in channelInfo.tabs.indices) {
                     val url_ = prepareUrl(channelInfo.tabs[i].url)
@@ -299,40 +217,11 @@ class UTurnProvider: Provider.Stub() {
                         break
                     }
                 }
-                if (index < 0) {
-                    //                onFail(feed, "feed channelInfo tabs index is invalid: ${feed.title}")
-                    return null
-                }
-                val channelTabInfo = ChannelTabInfo.getInfo(service, channelInfo.tabs[index])
-                Log.d(TAG, "refreshYoutubeFeed result1: $channelTabInfo ${channelTabInfo.relatedItems.size}")
-                var infoItems = channelTabInfo.relatedItems
-                var nextPage = channelTabInfo.nextPage
-                val eList = mutableSetOf<EpisodeIPC>()
-                var count = 0
-                while (infoItems.isNotEmpty()) {
-                    for (r_ in infoItems) {
-                        val r = r_ as StreamInfoItem
-                        count++
-                        if (r.infoType != InfoItem.InfoType.STREAM) continue
-                        //                                Log.d(TAG, "item: ${r.uploadDate?.date()?.time} ${r.name}")
-                        if (fullUpdate || (r.uploadDate?.localDateTime?.toKotlinLocalDateTime()?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds() ?: 0) > lastUpdateTime) eList.add(episodeFrom(r))
-                        else {
-                            nextPage = null
-                            break
-                        }
-                    }
-                    if (nextPage == null || count > 2*EPISODES_LIMIT || eList.size > EPISODES_LIMIT) break
-                    if (limitEpisodesCount > 0 && count > 1.2*limitEpisodesCount) break
-                    val page = ChannelTabInfo.getMoreItems(service, channelInfo.tabs[index], nextPage)
-                    nextPage = page.nextPage
-                    infoItems = page.items
-                    Log.d(TAG, "refreshYoutubeFeed more infoItems: ${infoItems.size}")
-                }
-                Log.d(TAG, "refreshYoutubeFeed eList.size: ${eList.size}")
-                feed_ = setupFeed(channelInfo)
-                feed_.episodes = eList.toMutableList()
+                if (index < 0) return null
+                runBlocking(Dispatchers.IO) { feed_ = fb?.buildYTChannel(index, "") }
             }
         }
+        feed_?.id = 0L
         return feed_
     }
 

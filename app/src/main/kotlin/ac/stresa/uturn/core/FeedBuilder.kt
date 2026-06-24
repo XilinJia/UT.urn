@@ -36,7 +36,7 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
 
     var curItemIndex: Int = 0
 
-    var channelTabInfo: ChannelTabInfo? = null
+//    var channelTabInfo: ChannelTabInfo? = null
     var infoItems: List<InfoItem> = listOf()
 
     private fun setupFeed(): FeedIPC {
@@ -74,7 +74,7 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
                 eList.add(e)
             }
             Log.d(TAG, "buildYTChannel number of episodes added: ${eList.size}")
-            if (nextPage == null || count > EPISODES_LIMIT) break
+            if (nextPage == null || (total > 0 && eList.size > total) || count > EPISODES_LIMIT) break
             try {
                 val page = PlaylistInfo.getMoreItems(service, urlInit, nextPage) ?: break
                 nextPage = page.nextPage
@@ -113,7 +113,7 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
         val cInfo = channelInfo ?:  return listOf()
 
         Log.d(TAG, "infoItems: ${infoItems.size}")
-        var nextPage = channelTabInfo?.nextPage
+//        var nextPage = channelTabInfo?.nextPage
         val titleSet = hashSetOf<String>()
         var count = 0
         val eList = mutableSetOf<EpisodeIPC>()
@@ -132,7 +132,7 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
             Log.d(TAG, "buildYTChannel number of episodes added: ${eList.size}")
             if (nextPage == null || (total > 0 && eList.size > total) || count > 2 * EPISODES_LIMIT || eList.size > EPISODES_LIMIT) break
             try {
-                val page = ChannelTabInfo.getMoreItems(service, cInfo.tabs.first(), nextPage)
+                val page = ChannelTabInfo.getMoreItems(service, cInfo.tabs.first(), nextPage!!)
                 nextPage = page.nextPage
                 infoItems = page.items
                 curItemIndex = 0
@@ -154,15 +154,15 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
         return try {
             selectedDownloadUrl = prepareUrl(url)
             Log.d(TAG, "selectedDownloadUrl: $selectedDownloadUrl url: $url")
-            channelTabInfo = ChannelTabInfo.getInfo(service, cInfo.tabs[index])
-            Log.d(TAG, "buildYTChannel result1: $channelTabInfo ${channelTabInfo?.relatedItems?.size}")
+            val channelTabInfo = ChannelTabInfo.getInfo(service, cInfo.tabs[index])
+            Log.d(TAG, "buildYTChannel result1: $channelTabInfo ${channelTabInfo.relatedItems?.size}")
             val feed_ = setupFeed()
             feed_.title = cInfo.name + " " + title
             feed_.description = cInfo.description
             feed_.author = cInfo.parentChannelName
             feed_.imageUrl = if (cInfo.avatars.isNotEmpty()) cInfo.avatars.first().url else null
-            infoItems = channelTabInfo!!.relatedItems
-            nextPage = channelTabInfo?.nextPage
+            infoItems = channelTabInfo.relatedItems
+            nextPage = channelTabInfo.nextPage
             withContext(Dispatchers.Main) { return@withContext feed_ }
         } catch (e: Throwable) {
             Log.d(TAG, "buildYTChannel error1 ${e.message}")

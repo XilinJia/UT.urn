@@ -1,3 +1,8 @@
+# 1.0.6
+
+* PodciniLib upped to 1.0.5
+* some dependencies update
+
 # 1.0.5
 
 * added block to disable dependency metadata in build.gradle, for f-droid build
