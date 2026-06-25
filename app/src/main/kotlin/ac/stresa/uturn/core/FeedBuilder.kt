@@ -95,7 +95,7 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
                 titleSet.add(e.title!!)
                 e.feedId = feedId
                 eList.add(e)
-                if (total > 0 && eList.size > total) return eList.toList()
+                if (total > 0 && eList.size >= total) return eList.toList()
             }
             Log.d(TAG, "buildYTChannel number of episodes added: ${eList.size}")
             if (nextPage == null || count > 2 * EPISODES_LIMIT || eList.size > EPISODES_LIMIT) return eList.toList()
@@ -152,7 +152,7 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
                 if (e.title == null || e.title in titleSet) continue
                 e.feedId = feedId
                 eList.add(e)
-                if (total > 0 && eList.size > total) return eList.toList()
+                if (total > 0 && eList.size >= total) return eList.toList()
             }
             Log.d(TAG, "buildYTChannel number of episodes added: ${eList.size}")
             if (nextPage == null || count > EPISODES_LIMIT) return eList.toList()
