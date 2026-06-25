@@ -28,21 +28,21 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
     private val service by lazy { NewPipe.getService("YouTube") }
     internal var channelInfo: ChannelInfo? = null
 
-    var feedId: Long = 0L
+    private var playlistInfo: PlaylistInfo? = null
 
-    var nextPage: Page? = null
-    var playlistInfo: PlaylistInfo? = null
-    var streamInfoItems: List<StreamInfoItem> = listOf()
+    private var feedId: Long = 0L
 
-    var curItemIndex: Int = 0
+    private var nextPage: Page? = null
 
-//    var channelTabInfo: ChannelTabInfo? = null
-    var infoItems: List<InfoItem> = listOf()
+    private var curItemIndex: Int = 0
+
+    private var streamInfoItems: List<StreamInfoItem> = listOf()
+
+    private var infoItems: List<InfoItem> = listOf()
 
     private fun setupFeed(): FeedIPC {
         val feed_ = FeedIPC()
         feed_.downloadUrl = selectedDownloadUrl
-//        feed_.isBuilding = true
         feedId = getEntityId()
         feed_.id = feedId
         feed_.type = FEEDTYPE
@@ -51,99 +51,6 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
         feed_.episodesDownloadable = false
         feed_.autoDownload = false
         return feed_
-    }
-
-    suspend fun episodesFromList(total: Int): List<EpisodeIPC> {
-        Log.d(TAG, "buildYTPlaylist infoItems: ${streamInfoItems.size}")
-        val titleSet = hashSetOf<String>()
-        var count = 0
-        val eList = mutableSetOf<EpisodeIPC>()
-        while (streamInfoItems.isNotEmpty()) {
-            for (i in curItemIndex until  streamInfoItems.size) {
-                val r = streamInfoItems[i]
-                //                        Log.d(TAG, "buildYTPlaylist relatedItem: $r")
-                curItemIndex = i
-                if (r.infoType != InfoItem.InfoType.STREAM) {
-                    Log.d(TAG, "buildYTPlaylist relatedItem is not STREAM, ignored")
-                    continue
-                }
-                count++
-                val e = episodeFrom(r)
-                if (e.title == null || e.title in titleSet) continue
-                e.feedId = feedId
-                eList.add(e)
-            }
-            Log.d(TAG, "buildYTChannel number of episodes added: ${eList.size}")
-            if (nextPage == null || (total > 0 && eList.size > total) || count > EPISODES_LIMIT) break
-            try {
-                val page = PlaylistInfo.getMoreItems(service, urlInit, nextPage) ?: break
-                nextPage = page.nextPage
-                streamInfoItems = page.items
-                curItemIndex = 0
-                Log.d(TAG, "buildYTPlaylist more infoItems: ${streamInfoItems.size}")
-            } catch (e: Throwable) {
-                Log.d(TAG, "buildYTPlaylist PlaylistInfo.getMoreItems error: ${e.message}")
-                withContext(Dispatchers.Main) { return@withContext null }
-                break
-            }
-        }
-        return eList.toList()
-    }
-
-    internal suspend fun buildYTPlaylist(): FeedIPC? {
-        return try {
-            playlistInfo = PlaylistInfo.getInfo(service, urlInit) ?: return null
-            selectedDownloadUrl = prepareUrl(urlInit)
-            Log.d(TAG, "buildYTPlaylist selectedDownloadUrl: $selectedDownloadUrl url: $urlInit")
-            val feed_ = setupFeed()
-            feed_.title = playlistInfo!!.name
-            feed_.description = playlistInfo?.description?.content ?: ""
-            feed_.author = playlistInfo?.uploaderName
-            feed_.imageUrl = if (playlistInfo!!.thumbnails.isNotEmpty()) playlistInfo!!.thumbnails.first().url else null
-            streamInfoItems = playlistInfo!!.relatedItems
-            nextPage = playlistInfo?.nextPage
-            withContext(Dispatchers.Main) { return@withContext feed_ }
-        } catch (e: Throwable) {
-            Log.d(TAG, "buildYTPlaylist error ${e.message}")
-            withContext(Dispatchers.Main) { return@withContext null }
-        }
-    }
-
-    suspend fun episodesFromChannel(total: Int): List<EpisodeIPC> {
-        val cInfo = channelInfo ?:  return listOf()
-
-        Log.d(TAG, "infoItems: ${infoItems.size}")
-//        var nextPage = channelTabInfo?.nextPage
-        val titleSet = hashSetOf<String>()
-        var count = 0
-        val eList = mutableSetOf<EpisodeIPC>()
-        while (infoItems.isNotEmpty()) {
-            for (i in curItemIndex until  infoItems.size) {
-                val r = infoItems[i]
-                count++
-                curItemIndex = i
-                if (r.infoType != InfoItem.InfoType.STREAM) continue
-                val e = episodeFrom(r as StreamInfoItem)
-                if (e.title == null || e.title in titleSet) continue
-                titleSet.add(e.title!!)
-                e.feedId = feedId
-                eList.add(e)
-            }
-            Log.d(TAG, "buildYTChannel number of episodes added: ${eList.size}")
-            if (nextPage == null || (total > 0 && eList.size > total) || count > 2 * EPISODES_LIMIT || eList.size > EPISODES_LIMIT) break
-            try {
-                val page = ChannelTabInfo.getMoreItems(service, cInfo.tabs.first(), nextPage!!)
-                nextPage = page.nextPage
-                infoItems = page.items
-                curItemIndex = 0
-                Log.d(TAG, "more infoItems: ${infoItems.size}")
-            } catch (e: Throwable) {
-                Log.d(TAG, "ChannelTabInfo.getMoreItems error: ${e.message}")
-                withContext(Dispatchers.Main) { return@withContext null }
-                break
-            }
-        }
-        return eList.toList()
     }
 
     internal suspend fun buildYTChannel(index: Int, title: String): FeedIPC?  {
@@ -170,8 +77,102 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
         }
     }
 
+    internal suspend fun episodesFromChannel(total: Int): List<EpisodeIPC> {
+        val cInfo = channelInfo ?:  return listOf()
+
+        Log.d(TAG, "infoItems: ${infoItems.size}")
+        val titleSet = hashSetOf<String>()
+        var count = 0
+        val eList = mutableSetOf<EpisodeIPC>()
+        while (infoItems.isNotEmpty()) {
+            for (i in curItemIndex until  infoItems.size) {
+                val r = infoItems[i]
+                count++
+                curItemIndex = i+1
+                if (r.infoType != InfoItem.InfoType.STREAM) continue
+                val e = episodeFrom(r as StreamInfoItem)
+                if (e.title == null || e.title in titleSet) continue
+                titleSet.add(e.title!!)
+                e.feedId = feedId
+                eList.add(e)
+                if (total > 0 && eList.size > total) return eList.toList()
+            }
+            Log.d(TAG, "buildYTChannel number of episodes added: ${eList.size}")
+            if (nextPage == null || count > 2 * EPISODES_LIMIT || eList.size > EPISODES_LIMIT) return eList.toList()
+            try {
+                val page = ChannelTabInfo.getMoreItems(service, cInfo.tabs.first(), nextPage!!)
+                nextPage = page?.nextPage
+                infoItems = page?.items ?: listOf()
+                curItemIndex = 0
+                Log.d(TAG, "more infoItems: ${infoItems.size}")
+            } catch (e: Throwable) {
+                Log.d(TAG, "ChannelTabInfo.getMoreItems error: ${e.message}")
+                withContext(Dispatchers.Main) { return@withContext null }
+                break
+            }
+        }
+        return eList.toList()
+    }
+
+    internal suspend fun buildYTPlaylist(): FeedIPC? {
+        return try {
+            playlistInfo = PlaylistInfo.getInfo(service, urlInit) ?: return null
+            selectedDownloadUrl = prepareUrl(urlInit)
+            Log.d(TAG, "buildYTPlaylist selectedDownloadUrl: $selectedDownloadUrl url: $urlInit")
+            val feed_ = setupFeed()
+            feed_.title = playlistInfo!!.name
+            feed_.description = playlistInfo?.description?.content ?: ""
+            feed_.author = playlistInfo?.uploaderName
+            feed_.imageUrl = if (playlistInfo!!.thumbnails.isNotEmpty()) playlistInfo!!.thumbnails.first().url else null
+            streamInfoItems = playlistInfo!!.relatedItems
+            nextPage = playlistInfo?.nextPage
+            withContext(Dispatchers.Main) { return@withContext feed_ }
+        } catch (e: Throwable) {
+            Log.d(TAG, "buildYTPlaylist error ${e.message}")
+            withContext(Dispatchers.Main) { return@withContext null }
+        }
+    }
+
+    internal suspend fun episodesFromList(total: Int): List<EpisodeIPC> {
+        Log.d(TAG, "buildYTPlaylist infoItems: ${streamInfoItems.size}")
+        val titleSet = hashSetOf<String>()
+        var count = 0
+        val eList = mutableSetOf<EpisodeIPC>()
+        while (streamInfoItems.isNotEmpty()) {
+            for (i in curItemIndex until  streamInfoItems.size) {
+                val r = streamInfoItems[i]
+                //                        Log.d(TAG, "buildYTPlaylist relatedItem: $r")
+                curItemIndex = i+1
+                if (r.infoType != InfoItem.InfoType.STREAM) {
+                    Log.d(TAG, "buildYTPlaylist relatedItem is not STREAM, ignored")
+                    continue
+                }
+                count++
+                val e = episodeFrom(r)
+                if (e.title == null || e.title in titleSet) continue
+                e.feedId = feedId
+                eList.add(e)
+                if (total > 0 && eList.size > total) return eList.toList()
+            }
+            Log.d(TAG, "buildYTChannel number of episodes added: ${eList.size}")
+            if (nextPage == null || count > EPISODES_LIMIT) return eList.toList()
+            try {
+                val page = PlaylistInfo.getMoreItems(service, urlInit, nextPage)
+                nextPage = page?.nextPage
+                streamInfoItems = page?.items ?: listOf()
+                curItemIndex = 0
+                Log.d(TAG, "buildYTPlaylist more infoItems: ${streamInfoItems.size}")
+            } catch (e: Throwable) {
+                Log.d(TAG, "buildYTPlaylist PlaylistInfo.getMoreItems error: ${e.message}")
+                withContext(Dispatchers.Main) { return@withContext null }
+                break
+            }
+        }
+        return eList.toList()
+    }
+
     companion object {
-        const val EPISODES_LIMIT = 3000
+        const val EPISODES_LIMIT = 5000
 
         const val FEEDTYPE = "YouTube"
 
@@ -193,7 +194,7 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
             return e
         }
 
-        fun episodeFrom(info: StreamInfo): EpisodeIPC {
+        internal fun episodeFrom(info: StreamInfo): EpisodeIPC {
             val e = EpisodeIPC()
             e.link = info.url
             e.title = info.name

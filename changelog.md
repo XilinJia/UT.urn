@@ -1,3 +1,8 @@
+# 1.0.7
+
+* enhanced getting episode list, and fixed a possible infinite loop
+* max number of episodes per channel/playlist is raised to 5000
+
 # 1.0.6
 
 * PodciniLib upped to 1.0.5
