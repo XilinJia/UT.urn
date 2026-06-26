@@ -20,7 +20,7 @@ import org.schabi.newpipe.extractor.playlist.PlaylistInfo
 import org.schabi.newpipe.extractor.stream.StreamInfo
 import org.schabi.newpipe.extractor.stream.StreamInfoItem
 
-class FeedBuilder(var urlInit: String, private val feedSource: String) {
+class FeedBuilder(var urlInit: String) {
     private val TAG = "FeedBuilder"
 
     var selectedDownloadUrl: String? = null
@@ -55,9 +55,11 @@ class FeedBuilder(var urlInit: String, private val feedSource: String) {
 
     internal suspend fun buildYTChannel(index: Int, title: String): FeedIPC?  {
         val cInfo = channelInfo ?:  return null
-        Log.d(TAG, "buildYTChannel result: $cInfo ${cInfo.tabs.size}")
+        Log.d(TAG, "buildYTChannel result: $index $cInfo ${cInfo.tabs.size}")
         var url = cInfo.tabs[index].url
         if (!url.startsWith("http")) url = urlInit
+//        if (feedSource.isNotEmpty()) url += "/$feedSource"
+        Log.d(TAG, "buildYTChannel url: $url")
         return try {
             selectedDownloadUrl = prepareUrl(url)
             Log.d(TAG, "selectedDownloadUrl: $selectedDownloadUrl url: $url")

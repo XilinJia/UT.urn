@@ -1,3 +1,7 @@
+# 1.0.8
+
+* PodciniLib upped to 1.0.7
+
 # 1.0.7
 
 * enhanced getting episode list, and fixed a possible infinite loop

@@ -161,10 +161,10 @@ class UTurnProvider: Provider.Stub() {
         }
     }
 
-    var fb: FeedBuilder? = null
+    private var fb: FeedBuilder? = null
 
-    override fun buildFeed(url: String, feedSource: String, index: Int): FeedIPC? {
-        fb = FeedBuilder(url, feedSource)
+    override fun buildFeed(url: String, index: Int): FeedIPC? {
+        fb = FeedBuilder(url)
         return runBlocking(Dispatchers.IO) {
             when {
                 isYTChannel(url) -> {
@@ -190,7 +190,7 @@ class UTurnProvider: Provider.Stub() {
 
     override fun feedToUpdate(url: String): FeedIPC? {
         val service = NewPipe.getService("YouTube")
-        fb = FeedBuilder(url, "")
+        fb = FeedBuilder(url)
         var feed_: FeedIPC?
         when {
             isYTChannel(url) -> {
@@ -237,7 +237,8 @@ class UTurnProvider: Provider.Stub() {
             if (!url.startsWith("http")) url = url_ + url
             try {
                 val urlEnd = Url(url).encodedPath.split("/").last()
-                if (urlEnd != "playlists" && urlEnd != "shorts") titles.add(urlEnd)
+//                if (urlEnd != "playlists" && urlEnd != "shorts") titles.add(urlEnd)
+                titles.add(urlEnd)
             } catch (e: Exception) { Log.e(TAG, "ytChannelValidTabs tab url not valid: $url") }
         }
         return titles.toList()
