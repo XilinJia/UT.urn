@@ -190,35 +190,46 @@ class UTurnProvider: Provider.Stub() {
 
     override fun feedToUpdate(url: String): FeedIPC? {
         val service = NewPipe.getService("YouTube")
-        fb = FeedBuilder(url)
         var feed_: FeedIPC?
         when {
             isYTChannel(url) -> {
+                fb = FeedBuilder(url)
                 fb?.channelInfo = ChannelInfo.getInfo(service, url)
-                Log.d(TAG, "refreshYoutubeFeed channelInfo: ${fb?.channelInfo} ${fb?.channelInfo?.tabs?.size}")
+                Log.d(TAG, "feedToUpdate channelInfo: ${fb?.channelInfo} ${fb?.channelInfo?.tabs?.size}")
                 runBlocking(Dispatchers.IO) { feed_ = fb?.buildYTChannel(0, "") }
             }
-            isYTPlaylist(url) -> runBlocking(Dispatchers.IO) { feed_ = fb?.buildYTPlaylist() }
+            isYTPlaylist(url) -> runBlocking(Dispatchers.IO) {
+                fb = FeedBuilder(url)
+                feed_ = fb?.buildYTPlaylist()
+            }
             else -> {
                 // channel tabs other than videos
-                fb?.channelInfo = ChannelInfo.getInfo(service, url)
+                Log.d(TAG, "feedToUpdate url: $url")
                 val uURL =  Url(url)
                 val pathSegments = uURL.encodedPath.split("/")
                 val channelUrl = "https://www.youtube.com/channel/${pathSegments[1]}"
-                Log.d(TAG, "channelUrl: $channelUrl")
+                Log.d(TAG, "feedToUpdate channelUrl: $channelUrl")
                 val channelInfo = ChannelInfo.getInfo(service, channelUrl)
-                Log.d(TAG, "refreshYoutubeFeed channelInfo: $channelInfo ${channelInfo.tabs.size}")
-                if (channelInfo.tabs.isEmpty()) return null
+                fb = FeedBuilder(channelUrl)
+                fb?.channelInfo = channelInfo
+                Log.d(TAG, "feedToUpdate channelInfo: $channelInfo ${channelInfo.tabs.size}")
+                if (channelInfo?.tabs.isNullOrEmpty()) return null
                 var index = -1
+                var urlEnd = ""
                 for (i in channelInfo.tabs.indices) {
+                    urlEnd = Url(channelInfo.tabs[i].url).encodedPath.split("/").last()
                     val url_ = prepareUrl(channelInfo.tabs[i].url)
+                    Log.d(TAG, "feedToUpdate url_: $url_")
                     if (url == url_) {
                         index = i
                         break
                     }
                 }
                 if (index < 0) return null
-                runBlocking(Dispatchers.IO) { feed_ = fb?.buildYTChannel(index, "") }
+                runBlocking(Dispatchers.IO) {
+                    feed_ = fb?.buildYTChannel(index, "")
+                    if (feed_ != null && urlEnd.isNotBlank()) feed_.title = "${feed_.title}: $urlEnd"
+                }
             }
         }
         feed_?.id = 0L
@@ -233,7 +244,7 @@ class UTurnProvider: Provider.Stub() {
         for (i in tabs.indices) {
             val t = channelInfo.tabs[i]
             var url = t.url
-            Log.d(TAG, "url: $url ${t.originalUrl} ${t.baseUrl}")
+            Log.d(TAG, "feedsTitlesAtUrl url: $url ${t.originalUrl} ${t.baseUrl}")
             if (!url.startsWith("http")) url = url_ + url
             try {
                 val urlEnd = Url(url).encodedPath.split("/").last()

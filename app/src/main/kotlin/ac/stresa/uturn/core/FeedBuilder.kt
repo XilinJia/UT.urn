@@ -56,9 +56,10 @@ class FeedBuilder(var urlInit: String) {
     internal suspend fun buildYTChannel(index: Int, title: String): FeedIPC?  {
         val cInfo = channelInfo ?:  return null
         Log.d(TAG, "buildYTChannel result: $index $cInfo ${cInfo.tabs.size}")
+        if (index >= cInfo.tabs.size) return null
         var url = cInfo.tabs[index].url
         if (!url.startsWith("http")) url = urlInit
-//        if (feedSource.isNotEmpty()) url += "/$feedSource"
+        Log.d(TAG, "buildYTChannel urlInit: $urlInit")
         Log.d(TAG, "buildYTChannel url: $url")
         return try {
             selectedDownloadUrl = prepareUrl(url)

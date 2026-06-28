@@ -1,3 +1,7 @@
+# 1.0.9
+
+* fixed issue updating live tab of a channel
+
 # 1.0.8
 
 * PodciniLib upped to 1.0.7
