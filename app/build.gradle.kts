@@ -18,8 +18,8 @@ android {
         applicationId = "ac.stresa.uturn"
         minSdk = 26
         targetSdk = 37
-        versionCode = 10
-        versionName = "1.0.9"
+        versionCode = 11
+        versionName = "1.0.10"
     }
 
 //      sourceSets {
@@ -60,7 +60,7 @@ android {
         includeInBundle = false
     }
     compileOptions {
-       isCoreLibraryDesugaringEnabled = true   // for VistaGuide
+        isCoreLibraryDesugaringEnabled = true   // for NewPipeExtractor
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -113,7 +113,7 @@ dependencies {
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.utils)
 
-    implementation("com.github.XilinJia:PodciniLib:1.0.7")
+    implementation("com.github.XilinJia:PodciniLib:1.0.8")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.5")
     implementation("com.github.teamnewpipe:NewPipeExtractor:v0.26.3")

@@ -80,7 +80,7 @@ class FeedBuilder(var urlInit: String) {
         }
     }
 
-    internal suspend fun episodesFromChannel(total: Int): List<EpisodeIPC> {
+    internal suspend fun episodesFromChannel(total: Int, since: Long = 0L): List<EpisodeIPC> {
         val cInfo = channelInfo ?:  return listOf()
 
         Log.d(TAG, "infoItems: ${infoItems.size}")
@@ -89,11 +89,15 @@ class FeedBuilder(var urlInit: String) {
         val eList = mutableSetOf<EpisodeIPC>()
         while (infoItems.isNotEmpty()) {
             for (i in curItemIndex until  infoItems.size) {
-                val r = infoItems[i]
+                val r = infoItems[i] as? StreamInfoItem ?: continue
                 count++
                 curItemIndex = i+1
                 if (r.infoType != InfoItem.InfoType.STREAM) continue
-                val e = episodeFrom(r as StreamInfoItem)
+                if ((r.uploadDate?.localDateTime?.toKotlinLocalDateTime()?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds() ?: 0) <= since) {
+                    nextPage = null
+                    break
+                }
+                val e = episodeFrom(r)
                 if (e.title == null || e.title in titleSet) continue
                 titleSet.add(e.title!!)
                 e.feedId = feedId
@@ -136,7 +140,7 @@ class FeedBuilder(var urlInit: String) {
         }
     }
 
-    internal suspend fun episodesFromList(total: Int): List<EpisodeIPC> {
+    internal suspend fun episodesFromList(total: Int, since: Long = 0L): List<EpisodeIPC> {
         Log.d(TAG, "buildYTPlaylist infoItems: ${streamInfoItems.size}")
         val titleSet = hashSetOf<String>()
         var count = 0
@@ -149,6 +153,10 @@ class FeedBuilder(var urlInit: String) {
                 if (r.infoType != InfoItem.InfoType.STREAM) {
                     Log.d(TAG, "buildYTPlaylist relatedItem is not STREAM, ignored")
                     continue
+                }
+                if ((r.uploadDate?.localDateTime?.toKotlinLocalDateTime()?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds() ?: 0) <= since) {
+                    nextPage = null
+                    break
                 }
                 count++
                 val e = episodeFrom(r)
@@ -192,8 +200,7 @@ class FeedBuilder(var urlInit: String) {
             e.fileUrl = null
             e.downloadUrl = item.url
             if (item.duration > 0) e.duration = item.duration.toInt() * 1000
-//            e.likeCount = item.likeCount.toInt()
-            // TODO: need to get likeCount
+//            e.likeCount = item.likeCount.toInt() // TODO: need to get likeCount
             return e
         }
 
@@ -204,7 +211,7 @@ class FeedBuilder(var urlInit: String) {
             e.description = info.description?.content
             e.imageUrl = info.thumbnails.first().url
             e.pubDate = info.uploadDate?.localDateTime?.let {
-                LocalDateTime(year = it.year, month = it.monthValue, day = it.dayOfMonth, hour = it.hour, minute = it.minute, second = it.second, nanosecond = it.nano).toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+                LocalDateTime(year = it.year, month = it.monthValue, day = it.dayOfMonth, hour = it.hour, minute = it.minute, second = it.second).toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
             } ?: 0
             e.viewCount = info.viewCount.toInt()
             e.likeCount = info.likeCount.toInt()

@@ -8,9 +8,15 @@ import ac.mdiq.podcini.shared.prepareUrl
 import ac.mdiq.podcini.sources.Provider
 import ac.stresa.uturn.core.FeedBuilder.Companion.episodeFrom
 import ac.stresa.uturn.core.util.InfoCache
+import android.service.autofill.UserData
 import android.util.Log
 import io.ktor.http.Url
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.schabi.newpipe.extractor.MediaFormat
 import org.schabi.newpipe.extractor.NewPipe
@@ -21,8 +27,46 @@ import org.schabi.newpipe.extractor.stream.DeliveryMethod
 import org.schabi.newpipe.extractor.stream.StreamInfo
 import org.schabi.newpipe.extractor.stream.VideoStream
 import java.net.URL
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.cancellation.CancellationException
 
 class UTurnProvider: Provider.Stub() {
+    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    private val ongoingRequests = ConcurrentHashMap<String, Job>()
+
+    fun loadUserData(userId: String): UserData? {
+        val requestKey = "loadUserData_$userId"
+        val deferredResult = CompletableDeferred<UserData?>()
+        ongoingRequests[requestKey] = deferredResult
+
+        val job = serviceScope.launch {
+            try {
+                deferredResult.complete(fetchUserFromNetwork(userId))
+            } catch (e: Exception) {
+                deferredResult.completeExceptionally(e)
+            }
+        }
+
+        deferredResult.invokeOnCompletion {
+            if (deferredResult.isCancelled) job.cancel()
+            ongoingRequests.remove(requestKey)
+        }
+
+        return runBlocking {
+            try { deferredResult.await() } catch (e: CancellationException) { null }
+        }
+    }
+
+    suspend fun fetchUserFromNetwork(userId: String): UserData? {
+        return null
+    }
+
+    fun cancelOperation(operationPrefix: String, id: String) {
+        val requestKey = "${operationPrefix}_$id"
+        ongoingRequests[requestKey]?.cancel()
+    }
+
     private val CACHE: InfoCache = InfoCache.instance
 
     override fun canHandleUrl(url_: String): Boolean {
@@ -177,12 +221,12 @@ class UTurnProvider: Provider.Stub() {
         }
     }
 
-    override fun getEpisodes(total: Int): List<EpisodeIPC> {
+    override fun getEpisodes(total: Int, since: Long): List<EpisodeIPC> {
         if (fb == null) return listOf()
         return runBlocking(Dispatchers.IO) {
             when {
-                isYTChannel(fb!!.urlInit) -> fb!!.episodesFromChannel(total)
-                isYTPlaylist(fb!!.urlInit) -> fb!!.episodesFromList(total)
+                isYTChannel(fb!!.urlInit) -> fb!!.episodesFromChannel(total, since)
+                isYTPlaylist(fb!!.urlInit) -> fb!!.episodesFromList(total, since)
                 else -> listOf()
             }
         }

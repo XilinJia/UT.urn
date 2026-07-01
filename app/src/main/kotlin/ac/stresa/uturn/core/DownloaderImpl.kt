@@ -15,7 +15,7 @@ import org.schabi.newpipe.extractor.downloader.Request
 import org.schabi.newpipe.extractor.downloader.Response
 import org.schabi.newpipe.extractor.exceptions.ReCaptchaException
 
-class VistaDownloaderImpl private constructor() : Downloader() {
+class DownloaderImpl private constructor() : Downloader() {
     val mCookies: MutableMap<String, String> = mutableMapOf()
 
     override fun execute(request: Request): Response = runBlocking(Dispatchers.IO) { executeSuspend(request) }
@@ -54,15 +54,15 @@ class VistaDownloaderImpl private constructor() : Downloader() {
         const val YOUTUBE_DOMAIN: String = "youtube.com"
         const val RECAPTCHA_COOKIES_KEY: String = "recaptcha_cookies"
         
-        var instance: VistaDownloaderImpl? = null
+        var instance: DownloaderImpl? = null
             private set
 
         /**
          * It's recommended to call exactly once in the entire lifetime of the application.
-         * @return a new instance of [VistaDownloaderImpl]
+         * @return a new instance of [DownloaderImpl]
          */
-        fun init(): VistaDownloaderImpl {
-            if (instance == null) instance = VistaDownloaderImpl()
+        fun init(): DownloaderImpl {
+            if (instance == null) instance = DownloaderImpl()
             return instance!!
         }
     }

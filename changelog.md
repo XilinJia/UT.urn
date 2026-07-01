@@ -1,3 +1,10 @@
+# 1.0.10
+
+* PodciniLib upped to 1.0.8
+* getEpisodes breaks out on since parameter
+* searcher name changed to "UT.urn"
+* some code refactoring
+
 # 1.0.9
 
 * fixed issue updating live tab of a channel

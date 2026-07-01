@@ -6,6 +6,8 @@ import com.grack.nanojson.JsonWriter
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
 
+// from NewPipe: https://github.com/TeamNewPipe/NewPipe
+
 /**
  * Parses the raw challenge data obtained from the Create endpoint and returns an object that can be
  * embedded in a JavaScript snippet.

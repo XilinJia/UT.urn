@@ -4,6 +4,8 @@ import android.content.Context
 import io.reactivex.rxjava3.core.Single
 import java.io.Closeable
 
+// from NewPipe: https://github.com/TeamNewPipe/NewPipe
+
 /**
  * This interface was created to allow for multiple methods to generate poTokens in the future (e.g.
  * via WebView and via a local DOM implementation)

@@ -36,5 +36,3 @@ ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktorUtils" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-#kotlin-android = { id = "org.jetbrains.kotlin.android" }
-#kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }

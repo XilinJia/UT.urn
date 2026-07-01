@@ -8,8 +8,7 @@ import org.schabi.newpipe.extractor.channel.ChannelInfoItem
 import org.schabi.newpipe.extractor.exceptions.ExtractionException
 import org.schabi.newpipe.extractor.search.SearchInfo
 
-class VistaGuideSearcher : IFeedSearchProvider.Stub() {
-
+class UTurnSearcher : IFeedSearchProvider.Stub() {
     override fun search(query: String): List<FeedSearchResult> {
         fun fromChannelInfoItem(info: ChannelInfoItem): FeedSearchResult {
             val title = info.name
@@ -19,7 +18,7 @@ class VistaGuideSearcher : IFeedSearchProvider.Stub() {
             val count: Int = info.streamCount.toInt()
             val update: String? = null
             val subscriberCount = info.subscriberCount.toInt()
-            return FeedSearchResult(title, imageUrl, feedUrl, author, count, update, subscriberCount, "VistaGuide")
+            return FeedSearchResult(title, imageUrl, feedUrl, author, count, update, subscriberCount, "UT.urn")
         }
 
         val service = try { NewPipe.getService("YouTube") } catch (e: ExtractionException) { throw ExtractionException("YouTube service not found") }
@@ -28,12 +27,12 @@ class VistaGuideSearcher : IFeedSearchProvider.Stub() {
             val podResults: MutableList<FeedSearchResult> = mutableListOf()
             for (ch in searchInfo.relatedItems) podResults.add(fromChannelInfoItem(ch as ChannelInfoItem))
             return podResults
-        } catch (e: Throwable) { Log.e("VistaGuidePodcastSearcher", "error: ${e.message}") }
+        } catch (e: Throwable) { Log.e("UTurnSearcher", "error: ${e.message}") }
         return listOf()
     }
 
     override fun lookupUrl(url: String): String = url
 
     override fun urlNeedsLookup(url: String): Boolean = false
-    override fun getName(): String? = "VistaGuide"
+    override fun getName(): String? = "UT.urn"
 }

@@ -12,6 +12,7 @@ import org.schabi.newpipe.extractor.services.youtube.PoTokenProvider
 import org.schabi.newpipe.extractor.services.youtube.PoTokenResult
 import org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper
 
+// from NewPipe: https://github.com/TeamNewPipe/NewPipe
 object PoTokenProviderImpl : PoTokenProvider {
     const val TAG = "PoTokenProviderImpl"
     private val webViewSupported by lazy { supportsWebView() }

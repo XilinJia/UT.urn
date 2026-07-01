@@ -10,10 +10,10 @@ import ac.stresa.uturn.core.FeedBuilder.Companion.FEEDTYPE
 import ac.stresa.uturn.core.Localization.Companion.getPreferredContentCountry
 import ac.stresa.uturn.core.Localization.Companion.getPreferredLocalization
 import ac.stresa.uturn.core.UTurnProvider
-import ac.stresa.uturn.core.VistaDownloaderImpl
-import ac.stresa.uturn.core.VistaDownloaderImpl.Companion.RECAPTCHA_COOKIES_KEY
-import ac.stresa.uturn.core.VistaDownloaderImpl.Companion.YOUTUBE_RESTRICTED_MODE_COOKIE_KEY
-import ac.stresa.uturn.core.VistaGuideSearcher
+import ac.stresa.uturn.core.DownloaderImpl
+import ac.stresa.uturn.core.DownloaderImpl.Companion.RECAPTCHA_COOKIES_KEY
+import ac.stresa.uturn.core.DownloaderImpl.Companion.YOUTUBE_RESTRICTED_MODE_COOKIE_KEY
+import ac.stresa.uturn.core.UTurnSearcher
 import ac.stresa.uturn.core.util.InfoCache
 import ac.stresa.uturn.core.util.potoken.PoTokenProviderImpl
 import android.app.Service
@@ -26,7 +26,7 @@ import org.schabi.newpipe.extractor.services.youtube.extractors.YoutubeStreamExt
 import kotlin.collections.set
 
 class GatewayService : Service() {
-    private val searchProviderBinder = VistaGuideSearcher()
+    private val searchProviderBinder = UTurnSearcher()
     private val uturnProviderBinder = UTurnProvider()
     private val gatewayBinder = object : IPodciniGateway.Stub() {
         override fun getAttributes(): ProviderAttrs {
@@ -56,7 +56,7 @@ class GatewayService : Service() {
     }
 
     private fun init() {
-        val vistaDownloader = VistaDownloaderImpl.init()
+        val vistaDownloader = DownloaderImpl.init()
         vistaDownloader.mCookies[RECAPTCHA_COOKIES_KEY] = ""
         vistaDownloader.mCookies.remove(YOUTUBE_RESTRICTED_MODE_COOKIE_KEY)
         //        vistaDownloader.mCookies[RECAPTCHA_COOKIES_KEY] = appPrefs.recaptcha_cookies

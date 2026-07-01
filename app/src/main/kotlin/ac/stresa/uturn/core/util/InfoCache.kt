@@ -11,9 +11,6 @@ import kotlin.time.Duration.Companion.minutes
 class InfoCache private constructor() {
     private val TAG: String = javaClass.getSimpleName()
 
-    /**
-     * Identifies the type of [Info] to put into the cache.
-     */
     enum class Type {
         STREAM,
         CHANNEL,
@@ -75,9 +72,6 @@ class InfoCache private constructor() {
         val instance: InfoCache = InfoCache()
         private const val MAX_ITEMS_ON_CACHE = 60
 
-        /**
-         * Trim the cache to this size.
-         */
         private const val TRIM_CACHE_TO = 30
 
         private val LRU_CACHE = LruCache<String, CacheData>(MAX_ITEMS_ON_CACHE)

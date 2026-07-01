@@ -1,7 +1,7 @@
 package ac.stresa.uturn.core.util.potoken
 
 import ac.mdiq.podcini.shared.USER_AGENT
-import ac.stresa.uturn.core.VistaDownloaderImpl
+import ac.stresa.uturn.core.DownloaderImpl
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -22,10 +22,11 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
+// from NewPipe: https://github.com/TeamNewPipe/NewPipe
+
 class PoTokenWebView private constructor(
     val context: Context,
-    // to be used exactly once only during initialization!
-    private val generatorEmitter: SingleEmitter<PoTokenGenerator>,
+    private val generatorEmitter: SingleEmitter<PoTokenGenerator>,   // to be used exactly once only during initialization!
 ) : PoTokenGenerator {
     private val webView = WebView(context)
     private val disposables = CompositeDisposable() // used only during initialization
@@ -262,7 +263,7 @@ class PoTokenWebView private constructor(
     private fun makeBotguardServiceRequest(url: String, data: String, handleResponseBody: (String) -> Unit) {
         disposables.add(
             Single.fromCallable {
-                return@fromCallable VistaDownloaderImpl.instance!!.post(
+                return@fromCallable DownloaderImpl.instance!!.post(
                     url,
                     mapOf(
                         // replace the downloader user agent
