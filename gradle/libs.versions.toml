@@ -4,15 +4,11 @@ appcompat = "1.7.1"
 coreKtx = "1.19.0"
 kotlinxCoroutinesAndroid = "1.11.0"
 kotlinxDatetime = "0.8.0"
-ktorClientCio = "3.5.0"
-ktorClientCore = "3.5.0"
-ktorClientOkhttp = "3.5.0"
-ktorHttp = "3.5.0"
-ktorUtils = "3.5.0"
+ktorClient = "3.5.1"
 lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
 kotlin = "2.4.0"
-composeBom = "2026.06.00"
+composeBom = "2026.06.01"
 webkit = "1.16.0"
 
 [libraries]
@@ -27,11 +23,11 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientCio" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientOkhttp" }
-ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktorHttp" }
-ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktorUtils" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClient" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClient" }
+ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktorClient" }
+ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktorClient" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
