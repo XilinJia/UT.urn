@@ -25,7 +25,7 @@ class FeedBuilder(var urlInit: String) {
 
     var selectedDownloadUrl: String? = null
 
-    private val service by lazy { NewPipe.getService("YouTube") }
+    private val service by lazy { NewPipe.getService(0) }
     internal var channelInfo: ChannelInfo? = null
 
     private var playlistInfo: PlaylistInfo? = null

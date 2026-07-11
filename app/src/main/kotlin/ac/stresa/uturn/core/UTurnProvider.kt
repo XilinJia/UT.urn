@@ -35,6 +35,10 @@ class UTurnProvider: Provider.Stub() {
 
     private val ongoingRequests = ConcurrentHashMap<String, Job>()
 
+    private val serviceId = 0
+    private val npService by lazy { NewPipe.getService(serviceId) }
+
+
     fun loadUserData(userId: String): UserData? {
         val requestKey = "loadUserData_$userId"
         val deferredResult = CompletableDeferred<UserData?>()
@@ -69,31 +73,18 @@ class UTurnProvider: Provider.Stub() {
 
     private val CACHE: InfoCache = InfoCache.instance
 
-    override fun canHandleUrl(url_: String): Boolean {
-        val url = try { URL(url_) } catch (e: Exception) { return false }
-        return (YoutubeParsingHelper.isYoutubeURL(url) && url.path.startsWith("/watch")) || YoutubeParsingHelper.isYoutubeServiceURL(url)
-    }
-
-    override fun canHandleFeed(url_: String): Boolean {
-        val url = try { URL(url_) } catch (e: Exception) { return false }
-        return YoutubeParsingHelper.isYoutubeURL(url) || YoutubeParsingHelper.isYoutubeServiceURL(url)
+    override fun canHandleUrl(url_: String): Int {
+        val url = try { URL(url_) } catch (e: Exception) { return -1 }
+        return if ((YoutubeParsingHelper.isYoutubeURL(url) && (url.path.startsWith("/watch") || url.path.startsWith("/live"))) || YoutubeParsingHelper.isYoutubeServiceURL(url)) 1 else -1
     }
 
     override fun buildEpisode(url: String): EpisodeIPC? {
-        val info = StreamInfo.getInfo(NewPipe.getService(0), url)
-        return episodeFrom(info)
+        val info = StreamInfo.getInfo(npService, url)
+        return if (info != null) episodeFrom(info) else null
     }
 
     override fun getEpisodeDescription(url: String): String? {
         return getStreamInfo(url)?.description?.content
-    }
-
-    override fun canHandleSharedMedia(urlString: String): Boolean {
-        val url = try { URL(urlString) } catch (e: Exception) {
-            Log.e(TAG, "canHandleSharedMedia url wrong format: $urlString")
-            return false
-        }
-        return (YoutubeParsingHelper.isYoutubeURL(url) && (url.path.startsWith("/watch") || url.path.startsWith("/live"))) || YoutubeParsingHelper.isYoutubeServiceURL(url)
     }
 
     override fun getAudioSpecs(media: EpisodeIPC): List<AudioSpec> {
@@ -121,9 +112,8 @@ class UTurnProvider: Provider.Stub() {
 
     internal fun getStreamInfo(url: String?, forceLoad: Boolean = false): StreamInfo? {
         if (url.isNullOrBlank()) return null
-        val serviceId = 0
         val cacheType = InfoCache.Type.STREAM
-        val streamInfo = StreamInfo.getInfo(NewPipe.getService(serviceId), url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) }
+        val streamInfo = StreamInfo.getInfo(npService, url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) }
         return if (forceLoad) {
             CACHE.removeInfo(serviceId, url, cacheType)
             streamInfo
@@ -212,7 +202,7 @@ class UTurnProvider: Provider.Stub() {
         return runBlocking(Dispatchers.IO) {
             when {
                 isYTChannel(url) -> {
-                    fb?.channelInfo = ChannelInfo.getInfo(NewPipe.getService(0), url)
+                    fb?.channelInfo = ChannelInfo.getInfo(npService, url)
                     fb?.buildYTChannel(index, "")
                 }
                 isYTPlaylist(url) -> if (index == 0) fb?.buildYTPlaylist() else null
@@ -233,12 +223,11 @@ class UTurnProvider: Provider.Stub() {
     }
 
     override fun feedToUpdate(url: String): FeedIPC? {
-        val service = NewPipe.getService("YouTube")
         var feed_: FeedIPC?
         when {
             isYTChannel(url) -> {
                 fb = FeedBuilder(url)
-                fb?.channelInfo = ChannelInfo.getInfo(service, url)
+                fb?.channelInfo = ChannelInfo.getInfo(npService, url)
                 Log.d(TAG, "feedToUpdate channelInfo: ${fb?.channelInfo} ${fb?.channelInfo?.tabs?.size}")
                 runBlocking(Dispatchers.IO) { feed_ = fb?.buildYTChannel(0, "") }
             }
@@ -253,7 +242,7 @@ class UTurnProvider: Provider.Stub() {
                 val pathSegments = uURL.encodedPath.split("/")
                 val channelUrl = "https://www.youtube.com/channel/${pathSegments[1]}"
                 Log.d(TAG, "feedToUpdate channelUrl: $channelUrl")
-                val channelInfo = ChannelInfo.getInfo(service, channelUrl)
+                val channelInfo = ChannelInfo.getInfo(npService, channelUrl)
                 fb = FeedBuilder(channelUrl)
                 fb?.channelInfo = channelInfo
                 Log.d(TAG, "feedToUpdate channelInfo: $channelInfo ${channelInfo.tabs.size}")
@@ -282,7 +271,7 @@ class UTurnProvider: Provider.Stub() {
 
     override fun feedsTitlesAtUrl(url_: String): List<String> {
         if (!isYTChannel(url_)) return listOf()
-        val channelInfo = ChannelInfo.getInfo(NewPipe.getService(0), url_)
+        val channelInfo = ChannelInfo.getInfo(npService, url_)
         val tabs = channelInfo.tabs
         val titles = mutableListOf<String>()
         for (i in tabs.indices) {

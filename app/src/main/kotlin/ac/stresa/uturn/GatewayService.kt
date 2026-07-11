@@ -35,11 +35,11 @@ class GatewayService : Service() {
                 apiVersion = PROVIDER_API_VERSION,
                 feedType = FEEDTYPE,
                 hasMultiQualities = true,
+                hasSeparateAVs = true,
+                supportDonwload = false,
                 hasViewCount = true,
                 hasLikeCount = true,
-                searcherTAG = "YouTube search",
-                shareLogType = ShareType.YTMedia.name,
-                feedDomains = listOf("youtube", "youtu.be"))
+                shareLogType = ShareType.YTMedia.name)
         }
         override fun getSearchProvider(): IFeedSearchProvider {
             return searchProviderBinder
@@ -56,14 +56,11 @@ class GatewayService : Service() {
     }
 
     private fun init() {
-        val vistaDownloader = DownloaderImpl.init()
-        vistaDownloader.mCookies[RECAPTCHA_COOKIES_KEY] = ""
-        vistaDownloader.mCookies.remove(YOUTUBE_RESTRICTED_MODE_COOKIE_KEY)
-        //        vistaDownloader.mCookies[RECAPTCHA_COOKIES_KEY] = appPrefs.recaptcha_cookies
-        //        if (appPrefs.restrictedModeEnabled) vistaDownloader.mCookies[YOUTUBE_RESTRICTED_MODE_COOKIE_KEY] = YOUTUBE_RESTRICTED_MODE_COOKIE
-        //        else vistaDownloader.mCookies.remove(YOUTUBE_RESTRICTED_MODE_COOKIE_KEY)
+        val downloader = DownloaderImpl.init()
+        downloader.mCookies[RECAPTCHA_COOKIES_KEY] = ""
+        downloader.mCookies.remove(YOUTUBE_RESTRICTED_MODE_COOKIE_KEY)
         InfoCache.instance.clearCache()
-        NewPipe.init(vistaDownloader, getPreferredLocalization(), getPreferredContentCountry())
+        NewPipe.init(downloader, getPreferredLocalization(), getPreferredContentCountry())
         for (s in ServiceList.all()) {
             if (s.serviceId == ServiceList.PeerTube.serviceId) {
                 //                not doing anything now

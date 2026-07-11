@@ -113,7 +113,7 @@ dependencies {
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.utils)
 
-    implementation("com.github.XilinJia:PodciniLib:1.0.8")
+    implementation("com.github.XilinJia:PodciniLib:1.0.9")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.5")
     implementation("com.github.teamnewpipe:NewPipeExtractor:v0.26.3")

@@ -1,5 +1,6 @@
 # 1.0.11
 
+* some code refactoring
 * some dependencies update
 
 # 1.0.10
