@@ -1,4 +1,4 @@
-package ac.stresa.uturn.core.util.potoken
+package ac.stresa.uturn.potoken
 
 import com.grack.nanojson.JsonObject
 import com.grack.nanojson.JsonParser

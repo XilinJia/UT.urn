@@ -1,3 +1,7 @@
+# 1.0.12
+
+* large code refactoring: common routines are moved to lib NPEConnector
+
 # 1.0.11
 
 * PodciniLib upped to 1.0.9

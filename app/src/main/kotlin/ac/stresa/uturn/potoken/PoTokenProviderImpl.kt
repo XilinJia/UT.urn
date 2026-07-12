@@ -1,6 +1,6 @@
-package ac.stresa.uturn.core.util.potoken
+package ac.stresa.uturn.potoken
 
-import ac.stresa.uturn.core.util.potoken.PoTokenProviderImpl.webPoTokenGenerator
+import ac.stresa.uturn.potoken.PoTokenProviderImpl.webPoTokenGenerator
 import ac.stresa.uturn.UTurnApp.Companion.getAppContext
 import android.os.Handler
 import android.os.Looper

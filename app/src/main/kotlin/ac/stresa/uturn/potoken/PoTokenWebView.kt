@@ -1,7 +1,7 @@
-package ac.stresa.uturn.core.util.potoken
+package ac.stresa.uturn.potoken
 
 import ac.mdiq.podcini.shared.USER_AGENT
-import ac.stresa.uturn.core.DownloaderImpl
+import ac.roma.npeconnector.DownloaderImpl
 import android.content.Context
 import android.os.Handler
 import android.os.Looper

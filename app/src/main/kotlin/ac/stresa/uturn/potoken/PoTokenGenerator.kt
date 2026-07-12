@@ -1,4 +1,4 @@
-package ac.stresa.uturn.core.util.potoken
+package ac.stresa.uturn.potoken
 
 import android.content.Context
 import io.reactivex.rxjava3.core.Single

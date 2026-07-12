@@ -1,4 +1,4 @@
-package ac.stresa.uturn.core.util.potoken
+package ac.stresa.uturn.potoken
 
 class PoTokenException(message: String) : Exception(message)
 
