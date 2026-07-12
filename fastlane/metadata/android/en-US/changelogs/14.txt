@@ -1,0 +1,1 @@
+* broadened conditions for canHandleUrl

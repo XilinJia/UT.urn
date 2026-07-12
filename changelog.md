@@ -1,3 +1,7 @@
+# 1.0.13
+
+* broadened conditions for canHandleUrl 
+
 # 1.0.12
 
 * large code refactoring: common routines are moved to lib NPEConnector

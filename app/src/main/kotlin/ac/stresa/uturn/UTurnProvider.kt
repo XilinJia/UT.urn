@@ -76,7 +76,7 @@ class UTurnProvider: Provider.Stub() {
 
     override fun canHandleUrl(url_: String): Int {
         val url = try { URL(url_) } catch (e: Exception) { return -1 }
-        return if ((YoutubeParsingHelper.isYoutubeURL(url) && (url.path.startsWith("/watch") || url.path.startsWith("/live"))) || YoutubeParsingHelper.isYoutubeServiceURL(url)) 1 else -1
+        return if (YoutubeParsingHelper.isYoutubeURL(url) || YoutubeParsingHelper.isYoutubeServiceURL(url)) 1 else -1
     }
 
     override fun buildEpisode(url: String): EpisodeIPC? {
