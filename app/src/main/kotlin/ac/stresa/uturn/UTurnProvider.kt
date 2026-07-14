@@ -7,10 +7,10 @@ import ac.mdiq.podcini.shared.VideoSpec
 import ac.mdiq.podcini.shared.prepareUrl
 import ac.mdiq.podcini.sources.Provider
 import ac.roma.npeconnector.FeedBuilder
-import ac.roma.npeconnector.FeedBuilder.Companion.episodeFrom
 import ac.roma.npeconnector.InfoCache
 import ac.roma.npeconnector.getSortedVStreams
 import ac.roma.npeconnector.toAudioSpec
+import ac.roma.npeconnector.toEpisodeIPC
 import android.service.autofill.UserData
 import android.util.Log
 import io.ktor.http.Url
@@ -80,8 +80,7 @@ class UTurnProvider: Provider.Stub() {
     }
 
     override fun buildEpisode(url: String): EpisodeIPC? {
-        val info = StreamInfo.getInfo(npService, url)
-        return if (info != null) episodeFrom(info) else null
+        return StreamInfo.getInfo(npService, url)?.toEpisodeIPC()
     }
 
     override fun getEpisodeDescription(url: String): String? {
@@ -175,7 +174,7 @@ class UTurnProvider: Provider.Stub() {
             isChannel(url) -> {
                 fb = FeedBuilder(FEEDTYPE, url, npService)
                 fb?.channelInfo = ChannelInfo.getInfo(npService, url)
-                Log.d(TAG, "feedToUpdate channelInfo: ${fb?.channelInfo} ${fb?.channelInfo?.tabs?.size}")
+//                Log.d(TAG, "feedToUpdate channelInfo: ${fb?.channelInfo} ${fb?.channelInfo?.tabs?.size}")
                 runBlocking(Dispatchers.IO) { feed_ = fb?.feedFromChannel(0, "") }
             }
             isPlaylist(url) -> runBlocking(Dispatchers.IO) {
@@ -184,22 +183,18 @@ class UTurnProvider: Provider.Stub() {
             }
             else -> {
                 // channel tabs other than videos
-                Log.d(TAG, "feedToUpdate url: $url")
                 val uURL =  Url(url)
                 val pathSegments = uURL.encodedPath.split("/")
                 val channelUrl = "https://www.youtube.com/channel/${pathSegments[1]}"
-                Log.d(TAG, "feedToUpdate channelUrl: $channelUrl")
                 val channelInfo = ChannelInfo.getInfo(npService, channelUrl)
                 fb = FeedBuilder(FEEDTYPE, channelUrl, npService)
                 fb?.channelInfo = channelInfo
-                Log.d(TAG, "feedToUpdate channelInfo: $channelInfo ${channelInfo.tabs.size}")
                 if (channelInfo?.tabs.isNullOrEmpty()) return null
                 var index = -1
                 var urlEnd = ""
                 for (i in channelInfo.tabs.indices) {
                     urlEnd = Url(channelInfo.tabs[i].url).encodedPath.split("/").last()
                     val url_ = prepareUrl(channelInfo.tabs[i].url)
-                    Log.d(TAG, "feedToUpdate url_: $url_")
                     if (url == url_) {
                         index = i
                         break
@@ -224,7 +219,7 @@ class UTurnProvider: Provider.Stub() {
         for (i in tabs.indices) {
             val t = channelInfo.tabs[i]
             var url = t.url
-            Log.d(TAG, "feedsTitlesAtUrl url: $url ${t.originalUrl} ${t.baseUrl}")
+//            Log.d(TAG, "feedsTitlesAtUrl url: $url ${t.originalUrl} ${t.baseUrl}")
             if (!url.startsWith("http")) url = url_ + url
             try {
                 val urlEnd = Url(url).encodedPath.split("/").last()

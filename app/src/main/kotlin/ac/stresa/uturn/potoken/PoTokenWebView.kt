@@ -72,7 +72,7 @@ class PoTokenWebView private constructor(
      * run it, and obtain an `integrityToken`.
      */
     private fun loadHtmlAndObtainBotguard() {
-        Log.d(TAG, "loadHtmlAndObtainBotguard() called")
+//        Log.d(TAG, "loadHtmlAndObtainBotguard() called")
 
         disposables.add(
             Single.fromCallable {
@@ -106,7 +106,7 @@ class PoTokenWebView private constructor(
      */
     @JavascriptInterface
     fun downloadAndRunBotguard() {
-        Log.d(TAG, "downloadAndRunBotguard() called")
+//        Log.d(TAG, "downloadAndRunBotguard() called")
 
         makeBotguardServiceRequest("https://www.youtube.com/api/jnn/v1/Create", "[ \"$REQUEST_KEY\" ]") { responseBody ->
             val parsedChallengeData = parseChallengeData(responseBody)
@@ -143,17 +143,17 @@ class PoTokenWebView private constructor(
      */
     @JavascriptInterface
     fun onRunBotguardResult(botguardResponse: String) {
-        Log.d(TAG, "botguardResponse: $botguardResponse")
+//        Log.d(TAG, "botguardResponse: $botguardResponse")
 
         makeBotguardServiceRequest("https://www.youtube.com/api/jnn/v1/GenerateIT", "[ \"$REQUEST_KEY\", \"$botguardResponse\" ]") { responseBody ->
-            Log.d(TAG, "GenerateIT response: $responseBody")
+//            Log.d(TAG, "GenerateIT response: $responseBody")
             val (integrityToken, expirationTimeInSeconds) = parseIntegrityTokenData(responseBody)
 
             // leave 10 minutes of margin just to be sure
 //            expirationInstant = Instant.now().plusSeconds(expirationTimeInSeconds - 600)
             expirationInstant  = Clock.System.now().plus((expirationTimeInSeconds - 600).seconds)
             webView.evaluateJavascript("this.integrityToken = $integrityToken") {
-                Log.d(TAG, "initialization finished, expiration=${expirationTimeInSeconds}s")
+//                Log.d(TAG, "initialization finished, expiration=${expirationTimeInSeconds}s")
                 generatorEmitter.onSuccess(this)
             }
         }
@@ -163,7 +163,7 @@ class PoTokenWebView private constructor(
     //region Obtaining poTokens
     override fun generatePoToken(identifier: String): Single<String> =
         Single.create { emitter ->
-            Log.d(TAG, "generatePoToken() called with identifier $identifier")
+//            Log.d(TAG, "generatePoToken() called with identifier $identifier")
             runOnMainThread(emitter) {
                 addPoTokenEmitter(identifier, emitter)
                 val u8Identifier = stringToU8(identifier)
@@ -201,13 +201,13 @@ class PoTokenWebView private constructor(
      */
     @JavascriptInterface
     fun onObtainPoTokenResult(identifier: String, poTokenU8: String) {
-        Log.d(TAG, "Generated poToken (before decoding): identifier=$identifier poTokenU8=$poTokenU8")
+//        Log.d(TAG, "Generated poToken (before decoding): identifier=$identifier poTokenU8=$poTokenU8")
         val poToken = try { u8ToBase64(poTokenU8)
         } catch (t: Throwable) {
             popPoTokenEmitter(identifier)?.onError(t)
             return
         }
-        Log.d(TAG, "Generated poToken: identifier=$identifier poToken=$poToken")
+//        Log.d(TAG, "Generated poToken: identifier=$identifier poToken=$poToken")
         popPoTokenEmitter(identifier)?.onSuccess(poToken)
     }
 

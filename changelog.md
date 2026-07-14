@@ -1,3 +1,9 @@
+# 1.1.0
+
+* PodciniLib upped to 1.1.1, NPEConnector upped to 1.1.2
+* supports media and playlist searches
+* some code refactoring
+
 # 1.0.13
 
 * broadened conditions for canHandleUrl 

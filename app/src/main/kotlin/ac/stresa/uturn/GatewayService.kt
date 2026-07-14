@@ -4,6 +4,7 @@ import ac.mdiq.podcini.shared.PROVIDER_API_VERSION
 import ac.mdiq.podcini.shared.ProviderAttrs
 import ac.mdiq.podcini.shared.ShareType
 import ac.mdiq.podcini.sources.IFeedSearchProvider
+import ac.mdiq.podcini.sources.IMediaSearchProvider
 import ac.mdiq.podcini.sources.IPodciniGateway
 import ac.mdiq.podcini.sources.Provider
 import ac.roma.npeconnector.DownloaderImpl
@@ -13,6 +14,7 @@ import ac.roma.npeconnector.FeedSearcher
 import ac.roma.npeconnector.InfoCache
 import ac.roma.npeconnector.Localization.Companion.getPreferredContentCountry
 import ac.roma.npeconnector.Localization.Companion.getPreferredLocalization
+import ac.roma.npeconnector.MediaSearcher
 import ac.stresa.uturn.core.UTurnProvider
 import ac.stresa.uturn.core.UTurnProvider.Companion.FEEDTYPE
 import ac.stresa.uturn.potoken.PoTokenProviderImpl
@@ -27,6 +29,7 @@ import kotlin.collections.set
 
 class GatewayService : Service() {
     private val searchProviderBinder = FeedSearcher("UT.urn", 0)
+    private val mediaSearcherBinder = MediaSearcher("UT.urn", 0)
     private val uturnProviderBinder = UTurnProvider()
     private val gatewayBinder = object : IPodciniGateway.Stub() {
         override fun getAttributes(): ProviderAttrs {
@@ -44,15 +47,15 @@ class GatewayService : Service() {
         override fun getSearchProvider(): IFeedSearchProvider {
             return searchProviderBinder
         }
+        override fun getMediaSearcher(): IMediaSearchProvider {
+            return mediaSearcherBinder
+        }
         override fun getProvider(): Provider {
             return uturnProviderBinder
         }
     }
     override fun onCreate() {
-        Log.e("GatewayService", "onCreate")
         init()
-        Log.e("GatewayService", "searchProviderBinder=$searchProviderBinder")
-        Log.e("GatewayService", "uturnProviderBinder=$uturnProviderBinder")
     }
 
     private fun init() {
@@ -70,7 +73,7 @@ class GatewayService : Service() {
     }
 
     override fun onBind(intent: Intent): IBinder? {
-        Log.d("GatewayService", "onBind: ${intent.action}")
+//        Log.d("GatewayService", "onBind: ${intent.action}")
         return gatewayBinder
     }
 }

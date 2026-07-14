@@ -9,7 +9,6 @@ class UTurnApp : Application() {
     override fun onCreate() {
         super.onCreate()
         UTurnApp = this
-        Log.d("YTApp", "YTApp onCreate")
     }
 
     companion object {

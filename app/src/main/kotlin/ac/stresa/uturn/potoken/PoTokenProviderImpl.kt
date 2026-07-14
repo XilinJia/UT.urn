@@ -113,7 +113,7 @@ object PoTokenProviderImpl : PoTokenProvider {
                 return getWebClientPoToken(videoId = videoId, forceRecreate = true)
             }
         }
-        Log.d(TAG, "poToken for $videoId: playerPot=$playerPot, streamingPot=$streamingPot, visitor_data=$visitorData")
+//        Log.d(TAG, "poToken for $videoId: playerPot=$playerPot, streamingPot=$streamingPot, visitor_data=$visitorData")
         return PoTokenResult(visitorData, playerPot, streamingPot)
     }
 
