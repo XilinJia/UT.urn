@@ -1,3 +1,9 @@
+# 1.1.2
+
+* NPEConnector upped to 1.1.3, fixed incomplete playlists
+* gradle upped to 9.7.1, AGP upped to 9.4.0
+* some dependencies update
+
 # 1.1.1
 
 * PodciniLib upped to 1.1.2
