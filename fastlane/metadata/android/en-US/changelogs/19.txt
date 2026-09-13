@@ -1,0 +1,2 @@
+* upped PodciniLib to 1.1.4 and NPEConnector to 1.1.6
+* implemented function getCaptionSpecs

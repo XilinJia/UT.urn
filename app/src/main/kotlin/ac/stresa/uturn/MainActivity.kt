@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PodciniProviderTheme {
                 Box(modifier = Modifier.background(Color.Black).fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("UT.urn Installed", color = Color.Green)
+                    Text("UT.urn Installed. No need to launch it, just use it from Podcini.A", color = Color.Green)
                 }
             }
         }

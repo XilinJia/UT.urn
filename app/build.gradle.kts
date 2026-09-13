@@ -18,8 +18,8 @@ android {
         applicationId = "ac.stresa.uturn"
         minSdk = 26
         targetSdk = 37
-        versionCode = 17
-        versionName = "1.1.2"
+        versionCode = 19
+        versionName = "1.1.4"
     }
 
 //      sourceSets {
@@ -104,7 +104,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
@@ -116,11 +115,10 @@ dependencies {
     implementation(libs.ktor.http)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
-    implementation(libs.ktor.client.cio)
     implementation(libs.ktor.utils)
 
-   implementation("com.github.XilinJia:PodciniLib:1.1.2")
-   implementation("com.github.XilinJia:NPEConnector:1.1.4")
+   implementation("com.github.XilinJia:PodciniLib:1.1.4")
+   implementation("com.github.XilinJia:NPEConnector:1.1.6")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.5")
     implementation("com.github.teamnewpipe:NewPipeExtractor:v0.26.5")

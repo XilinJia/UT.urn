@@ -1,6 +1,17 @@
+# 1.1.4
+
+* upped PodciniLib to 1.1.4 and NPEConnector to 1.1.6
+* implemented function getCaptionSpecs
+
+# 1.1.3
+
+* added "no need to launch text"
+* upped PodciniLib to 1.1.3 and NPEConnector to 1.1.5
+* upped some dependencies and removed some unused ones
+
 # 1.1.2
 
-* NPEConnector upped to 1.1.3, fixed incomplete playlists
+* NPEConnector upped to 1.1.4, fixed incomplete playlists
 * gradle upped to 9.7.1, AGP upped to 9.4.0
 * some dependencies update
 

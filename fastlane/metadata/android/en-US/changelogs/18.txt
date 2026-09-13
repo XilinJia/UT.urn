@@ -1,0 +1,3 @@
+* added "no need to launch text"
+* upped PodciniLib to 1.1.3 and NPEConnector to 1.1.5
+* upped some dependencies and removed some unused ones

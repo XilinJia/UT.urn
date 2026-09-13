@@ -1,6 +1,7 @@
 package ac.stresa.uturn.core
 
 import ac.mdiq.podcini.shared.AudioSpec
+import ac.mdiq.podcini.shared.CaptionSpec
 import ac.mdiq.podcini.shared.EpisodeIPC
 import ac.mdiq.podcini.shared.FeedIPC
 import ac.mdiq.podcini.shared.VideoSpec
@@ -10,6 +11,7 @@ import ac.roma.npeconnector.FeedBuilder
 import ac.roma.npeconnector.InfoCache
 import ac.roma.npeconnector.getSortedVStreams
 import ac.roma.npeconnector.toAudioSpec
+import ac.roma.npeconnector.toCaptionSpec
 import ac.roma.npeconnector.toEpisodeIPC
 import android.service.autofill.UserData
 import android.util.Log
@@ -45,22 +47,14 @@ class UTurnProvider: Provider.Stub() {
         val deferredResult = CompletableDeferred<UserData?>()
         ongoingRequests[requestKey] = deferredResult
 
-        val job = serviceScope.launch {
-            try {
-                deferredResult.complete(fetchUserFromNetwork(userId))
-            } catch (e: Exception) {
-                deferredResult.completeExceptionally(e)
-            }
-        }
+        val job = serviceScope.launch { try { deferredResult.complete(fetchUserFromNetwork(userId)) } catch (e: Exception) { deferredResult.completeExceptionally(e) } }
 
         deferredResult.invokeOnCompletion {
             if (deferredResult.isCancelled) job.cancel()
             ongoingRequests.remove(requestKey)
         }
 
-        return runBlocking {
-            try { deferredResult.await() } catch (e: CancellationException) { null }
-        }
+        return runBlocking { try { deferredResult.await() } catch (e: CancellationException) { null } }
     }
 
     suspend fun fetchUserFromNetwork(userId: String): UserData? {
@@ -85,6 +79,13 @@ class UTurnProvider: Provider.Stub() {
 
     override fun getEpisodeDescription(url: String): String? {
         return getStreamInfo(url)?.description?.content
+    }
+
+    override fun getCaptionSpecs(media: EpisodeIPC): List<CaptionSpec> {
+        var cSpecs = listOf<CaptionSpec>()
+        val subs = getStreamInfo(media.downloadUrl)?.subtitles
+        if (subs != null) cSpecs = subs.mapNotNull { it.toCaptionSpec() }.toList()
+        return cSpecs
     }
 
     override fun getAudioSpecs(media: EpisodeIPC): List<AudioSpec> {
