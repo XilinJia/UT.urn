@@ -39,7 +39,8 @@ class GatewayService : Service() {
                 hasSeparateAVs = true,
                 supportDownload = false,
                 hasViewCount = true,
-                hasLikeCount = true
+                hasLikeCount = true,
+                hasTranscripts = true,
             )
         }
         override fun getSearchProvider(): IFeedSearchProvider {

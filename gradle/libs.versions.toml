@@ -1,13 +1,13 @@
 [versions]
-agp = "9.4.0"
+agp = "9.4.1"
 appcompat = "1.8.0"
 coreKtx = "1.19.0"
 kotlinxCoroutinesAndroid = "1.11.0"
 kotlinxDatetime = "0.8.0"
-ktorClient = "3.5.2"
+ktorClient = "3.6.0"
 lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
-kotlin = "2.4.0"
+kotlin = "2.4.20"
 composeBom = "2026.09.00"
 webkit = "1.17.0"
 

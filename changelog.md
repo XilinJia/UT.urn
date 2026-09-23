@@ -1,3 +1,10 @@
+# 1.1.5
+
+* PodciniLib upped to 1.1.5, NPEConnector upped to 1.1.7
+* added hasTranscripts in ProviderAttrs
+* kotlin upped to 2.4.20
+* dependencies update
+
 # 1.1.4
 
 * upped PodciniLib to 1.1.4 and NPEConnector to 1.1.6

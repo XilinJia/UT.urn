@@ -38,7 +38,10 @@ class PoTokenWebView private constructor(
         val webViewSettings = webView.settings
         //noinspection SetJavaScriptEnabled we want to use JavaScript!
         webViewSettings.javaScriptEnabled = true
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_ENABLE)) WebSettingsCompat.setSafeBrowsingEnabled(webViewSettings, false)
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_ENABLE)) WebSettingsCompat.setSafeBrowsingEnabled(
+            webViewSettings,
+            false
+        )
 
         webViewSettings.userAgentString = USER_AGENT
         webViewSettings.blockNetworkLoads = true // the WebView does not need internet access
@@ -108,7 +111,10 @@ class PoTokenWebView private constructor(
     fun downloadAndRunBotguard() {
 //        Log.d(TAG, "downloadAndRunBotguard() called")
 
-        makeBotguardServiceRequest("https://www.youtube.com/api/jnn/v1/Create", "[ \"$REQUEST_KEY\" ]") { responseBody ->
+        makeBotguardServiceRequest(
+            "https://www.youtube.com/api/jnn/v1/Create",
+            "[ \"$REQUEST_KEY\" ]"
+        ) { responseBody ->
             val parsedChallengeData = parseChallengeData(responseBody)
             webView.evaluateJavascript(
                 """try {
@@ -145,13 +151,16 @@ class PoTokenWebView private constructor(
     fun onRunBotguardResult(botguardResponse: String) {
 //        Log.d(TAG, "botguardResponse: $botguardResponse")
 
-        makeBotguardServiceRequest("https://www.youtube.com/api/jnn/v1/GenerateIT", "[ \"$REQUEST_KEY\", \"$botguardResponse\" ]") { responseBody ->
+        makeBotguardServiceRequest(
+            "https://www.youtube.com/api/jnn/v1/GenerateIT",
+            "[ \"$REQUEST_KEY\", \"$botguardResponse\" ]"
+        ) { responseBody ->
 //            Log.d(TAG, "GenerateIT response: $responseBody")
             val (integrityToken, expirationTimeInSeconds) = parseIntegrityTokenData(responseBody)
 
             // leave 10 minutes of margin just to be sure
 //            expirationInstant = Instant.now().plusSeconds(expirationTimeInSeconds - 600)
-            expirationInstant  = Clock.System.now().plus((expirationTimeInSeconds - 600).seconds)
+            expirationInstant = Clock.System.now().plus((expirationTimeInSeconds - 600).seconds)
             webView.evaluateJavascript("this.integrityToken = $integrityToken") {
 //                Log.d(TAG, "initialization finished, expiration=${expirationTimeInSeconds}s")
                 generatorEmitter.onSuccess(this)
@@ -202,7 +211,8 @@ class PoTokenWebView private constructor(
     @JavascriptInterface
     fun onObtainPoTokenResult(identifier: String, poTokenU8: String) {
 //        Log.d(TAG, "Generated poToken (before decoding): identifier=$identifier poTokenU8=$poTokenU8")
-        val poToken = try { u8ToBase64(poTokenU8)
+        val poToken = try {
+            u8ToBase64(poTokenU8)
         } catch (t: Throwable) {
             popPoTokenEmitter(identifier)?.onError(t)
             return
@@ -234,7 +244,8 @@ class PoTokenWebView private constructor(
      */
     private fun popPoTokenEmitter(identifier: String): SingleEmitter<String>? {
         return synchronized(poTokenEmitters) {
-            poTokenEmitters.indexOfFirst { it.first == identifier }.takeIf { it >= 0 }?.let { poTokenEmitters.removeAt(it).second }
+            poTokenEmitters.indexOfFirst { it.first == identifier }.takeIf { it >= 0 }
+                ?.let { poTokenEmitters.removeAt(it).second }
         }
     }
 
@@ -326,6 +337,7 @@ class PoTokenWebView private constructor(
 
     companion object : PoTokenGenerator.Factory {
         private const val TAG = "PoTokenWebView:"
+
         // Public API key used by BotGuard, which has been got by looking at BotGuard requests
         private const val GOOGLE_API_KEY = "AIzaSyDyT5W0Jh49F30Pqqtyfdf7pDLFKLJoAnw" // NOSONAR
         private const val REQUEST_KEY = "O43z0dpjhgX20SCx4KAo"
