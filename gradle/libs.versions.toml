@@ -1,15 +1,15 @@
 [versions]
 agp = "9.4.1"
 appcompat = "1.8.0"
-coreKtx = "1.19.0"
+coreKtx = "1.19.1"
 kotlinxCoroutinesAndroid = "1.11.0"
 kotlinxDatetime = "0.8.0"
 ktorClient = "3.6.0"
 lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 composeBom = "2026.09.00"
-webkit = "1.17.0"
+webkit = "1.17.1"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -26,6 +26,7 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorCli
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClient" }
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktorClient" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktorClient" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

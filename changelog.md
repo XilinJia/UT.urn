@@ -1,3 +1,9 @@
+# 1.1.6
+
+* PodciniLib upped to 1.1.6, NPEConnector upped to 1.1.8
+* improved StreamInfo cache handling
+* implemented getMediaSpecs and httpAtribsFor in the new API
+
 # 1.1.5
 
 * PodciniLib upped to 1.1.5, NPEConnector upped to 1.1.7

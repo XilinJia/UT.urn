@@ -25,4 +25,17 @@ dependencyResolutionManagement {
 
 //rootProject.name = "UTurn"
 include(":app")
- 
+
+// includeBuild("../PodciniLib") {
+//     dependencySubstitution {
+//         substitute(module("com.github.XilinJia:PodciniLib"))
+//             .using(project(":"))
+//     }
+// }
+//
+// includeBuild("../NPEConnector") {
+//     dependencySubstitution {
+//         substitute(module("com.github.XilinJia:NPEConnector"))
+//             .using(project(":"))
+//     }
+// }

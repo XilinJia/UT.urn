@@ -10,7 +10,7 @@ android {
     namespace = "ac.stresa.uturn"
     compileSdk {
         version = release(37) {
-            minorApiLevel = 0
+            minorApiLevel = 2
         }
     }
 
@@ -18,22 +18,9 @@ android {
         applicationId = "ac.stresa.uturn"
         minSdk = 26
         targetSdk = 37
-        versionCode = 20
-        versionName = "1.1.5"
+        versionCode = 21
+        versionName = "1.1.6"
     }
-
-//      sourceSets {
-//          getByName("main") {
-//              kotlin.directories.add("../../PodciniLib/src/main/kotlin")
-//              aidl.directories.add("../../PodciniLib/src/main/aidl")
-//          }
-//      }
-//
-//      sourceSets {
-//          getByName("main") {
-//              kotlin.directories.add("../../NPEConnector/src/main/kotlin")
-//          }
-//      }
 
     buildFeatures {
         compose = true
@@ -116,9 +103,10 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.utils)
+//    implementation(libs.ktor.encoding)
 
-   implementation("com.github.XilinJia:PodciniLib:1.1.5")
-   implementation("com.github.XilinJia:NPEConnector:1.1.7")
+   implementation("com.github.XilinJia:PodciniLib:1.1.6")
+   implementation("com.github.XilinJia:NPEConnector:1.1.8")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.5")
     implementation("com.github.teamnewpipe:NewPipeExtractor:v0.26.5")

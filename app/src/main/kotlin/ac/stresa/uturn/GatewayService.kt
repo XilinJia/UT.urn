@@ -37,7 +37,6 @@ class GatewayService : Service() {
                 hasVideo = true,
                 hasMultiQualities = true,
                 hasSeparateAVs = true,
-                supportDownload = false,
                 hasViewCount = true,
                 hasLikeCount = true,
                 hasTranscripts = true,
