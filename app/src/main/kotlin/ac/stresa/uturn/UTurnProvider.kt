@@ -72,7 +72,8 @@ class UTurnProvider: Provider.Stub() {
             val collectedStreams = mutableSetOf<AudioSpec>()
             for (stream in audioStreams) {
                 //                Log.d(TAG, "getFilteredAStreams stream: ${stream.audioTrackId} ${stream.bitrate} ${stream.deliveryMethod} ${stream.format}")
-                if (stream == null || stream.deliveryMethod == DeliveryMethod.TORRENT || (stream.deliveryMethod == DeliveryMethod.HLS && stream.format == MediaFormat.OPUS)) continue
+//                if (stream == null || stream.deliveryMethod == DeliveryMethod.TORRENT || (stream.deliveryMethod == DeliveryMethod.HLS && stream.format == MediaFormat.OPUS)) continue
+                if (stream == null || stream.deliveryMethod == DeliveryMethod.TORRENT) continue
                 collectedStreams.add(stream.toAudioSpec())
             }
             aSpecs = collectedStreams.toList().sortedWith(compareBy { it.bitrate })

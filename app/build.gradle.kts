@@ -18,8 +18,8 @@ android {
         applicationId = "ac.stresa.uturn"
         minSdk = 26
         targetSdk = 37
-        versionCode = 21
-        versionName = "1.1.6"
+        versionCode = 22
+        versionName = "1.1.7"
     }
 
     buildFeatures {
