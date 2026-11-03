@@ -4,12 +4,12 @@ appcompat = "1.8.0"
 coreKtx = "1.19.1"
 kotlinxCoroutinesAndroid = "1.11.0"
 kotlinxDatetime = "0.8.0"
-ktorClient = "3.6.0"
+ktorClient = "3.6.1"
 lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
 kotlin = "2.4.21"
 composeBom = "2026.09.00"
-webkit = "1.17.1"
+webkit = "1.18.0"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }

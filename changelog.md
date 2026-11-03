@@ -1,3 +1,8 @@
+# 1.1.8
+
+* PodciniLib upped to 1.1.7, NPEConnector upped to 1.1.9
+* some dependencies update
+
 # 1.1.7
 
 * accepting HLS audio streams

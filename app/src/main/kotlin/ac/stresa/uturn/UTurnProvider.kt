@@ -1,4 +1,4 @@
-package ac.stresa.uturn.core
+package ac.stresa.uturn
 
 import ac.mdiq.podcini.shared.AudioSpec
 import ac.mdiq.podcini.shared.CaptionSpec
@@ -19,7 +19,6 @@ import android.util.Log
 import io.ktor.http.Url
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.schabi.newpipe.extractor.MediaFormat
 import org.schabi.newpipe.extractor.NewPipe
 import org.schabi.newpipe.extractor.channel.ChannelInfo
 import org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper
@@ -63,23 +62,30 @@ class UTurnProvider: Provider.Stub() {
         return cSpecs
     }
 
-    override fun getMediaSpecs(media: EpisodeIPC, force: Boolean): MediaSpecs {
+    override fun getMediaSpecs(media: EpisodeIPC, preferredLocales: List<String>, force: Boolean): MediaSpecs {
+//        Log.d(TAG, "getMediaSpecs preferredLocales: ${preferredLocales.size}")
         val mediaSpecs = MediaSpecs()
         val streamInfo = getStreamInfo(media.downloadUrl, force) ?: return mediaSpecs
         var aSpecs = listOf<AudioSpec>()
         val audioStreams = streamInfo.audioStreams
         if (audioStreams != null) {
+            val size = audioStreams.size
             val collectedStreams = mutableSetOf<AudioSpec>()
             for (stream in audioStreams) {
-                //                Log.d(TAG, "getFilteredAStreams stream: ${stream.audioTrackId} ${stream.bitrate} ${stream.deliveryMethod} ${stream.format}")
+//                Log.d(TAG, "getMediaSpecs stream: ${stream.audioTrackId} ${stream.bitrate} ${stream.deliveryMethod} ${stream.format}")
 //                if (stream == null || stream.deliveryMethod == DeliveryMethod.TORRENT || (stream.deliveryMethod == DeliveryMethod.HLS && stream.format == MediaFormat.OPUS)) continue
                 if (stream == null || stream.deliveryMethod == DeliveryMethod.TORRENT) continue
+                val locale = stream.audioLocale?.toLanguageTag()
+                if (size > 100 && locale != null && preferredLocales.isNotEmpty() && preferredLocales.none { it.equals(locale, ignoreCase = true) }) continue
                 collectedStreams.add(stream.toAudioSpec())
             }
             aSpecs = collectedStreams.toList().sortedWith(compareBy { it.bitrate })
+//            Log.d(TAG, "getMediaSpecs after sort audio aSpecs: ${aSpecs.size}")
         }
-        val vSpecs = getSortedVStreams(listOf(), streamInfo.videoOnlyStreams, ascendingOrder = true, preferVideoOnlyStreams = true)
-        val mSpecs = getSortedVStreams(streamInfo.videoStreams, listOf(), ascendingOrder = true, preferVideoOnlyStreams = false)
+        val vSpecs = try { getSortedVStreams(listOf(), streamInfo.videoOnlyStreams, ascendingOrder = true, preferVideoOnlyStreams = true) } catch (e: Exception) { listOf() }
+//        Log.d(TAG, "getMediaSpecs got vSpecs: ${vSpecs.size}")
+        val mSpecs = try { getSortedVStreams(streamInfo.videoStreams, listOf(), ascendingOrder = true, preferVideoOnlyStreams = false) } catch (e: Exception) { listOf() }
+//        Log.d(TAG, "getMediaSpecs got mSpecs: ${mSpecs.size}")
         mediaSpecs.audioSpecs = aSpecs
         mediaSpecs.videoSpecs = vSpecs
         mediaSpecs.muxedSpecs = mSpecs
@@ -92,10 +98,10 @@ class UTurnProvider: Provider.Stub() {
         val cacheType = InfoCache.Type.STREAM
         return if (forceLoad) {
             CACHE.removeInfo(serviceId, url, cacheType)
-            StreamInfo.getInfo(npService, url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) }
+            try { StreamInfo.getInfo(npService, url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) } } catch (e: Exception) { null}
         } else {
             val cachedData = CACHE.getFromKey(serviceId, url, cacheType) as? StreamInfo
-            cachedData ?: StreamInfo.getInfo(npService, url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) }
+            cachedData ?: try { StreamInfo.getInfo(npService, url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) } } catch (e: Exception) { null}
         }
     }
 

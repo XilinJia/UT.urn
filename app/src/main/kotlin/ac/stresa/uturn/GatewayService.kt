@@ -14,8 +14,7 @@ import ac.roma.npeconnector.InfoCache
 import ac.roma.npeconnector.Localization.Companion.getPreferredContentCountry
 import ac.roma.npeconnector.Localization.Companion.getPreferredLocalization
 import ac.roma.npeconnector.MediaSearcher
-import ac.stresa.uturn.core.UTurnProvider
-import ac.stresa.uturn.core.UTurnProvider.Companion.FEEDTYPE
+import ac.stresa.uturn.UTurnProvider.Companion.FEEDTYPE
 import ac.stresa.uturn.potoken.PoTokenProviderImpl
 import android.app.Service
 import android.content.Intent
