@@ -48,6 +48,7 @@ class UTurnProvider: Provider.Stub() {
     }
 
     override fun buildEpisode(url: String): EpisodeIPC? {
+        // TODO: get member only info: public org.schabi.newpipe.extractor.stream.StreamExtractor.Privacy getPrivacy() { /* compiled code */ }
         return getStreamInfo(url)?.toEpisodeIPC()
     }
 
