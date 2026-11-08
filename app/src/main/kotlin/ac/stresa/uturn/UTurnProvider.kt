@@ -35,8 +35,6 @@ class UTurnProvider: Provider.Stub() {
     override fun httpAtribsFor(url: String): HTTPAttribs {
         val ua = when {
             YoutubeParsingHelper.isVisionOsStreamingUrl(url) -> YoutubeParsingHelper.getVisionOsUserAgent(null)
-            YoutubeParsingHelper.isAndroidStreamingUrl(url) -> YoutubeParsingHelper.getAndroidUserAgent(null)
-            YoutubeParsingHelper.isIosStreamingUrl(url) -> YoutubeParsingHelper.getIosUserAgent(null)
             else -> USER_AGENT
         }
         return HTTPAttribs(ua, "https://www.youtube.com", "https://www.youtube.com")
@@ -53,20 +51,22 @@ class UTurnProvider: Provider.Stub() {
     }
 
     override fun getEpisodeDescription(url: String): String? {
-        return getStreamInfo(url)?.description?.content
+        val info = getStreamInfo(url)
+//        Log.d(TAG, "getEpisodeDescription privacy: ${info?.privacy?.name}")
+        return info?.description?.content
     }
 
-    override fun getCaptionSpecs(media: EpisodeIPC): List<CaptionSpec> {
+    override fun getCaptionSpecs(url: String): List<CaptionSpec> {
         var cSpecs = listOf<CaptionSpec>()
-        val subs = getStreamInfo(media.downloadUrl)?.subtitles
+        val subs = getStreamInfo(url)?.subtitles
         if (subs != null) cSpecs = subs.mapNotNull { it.toCaptionSpec() }.toList()
         return cSpecs
     }
 
-    override fun getMediaSpecs(media: EpisodeIPC, preferredLocales: List<String>, force: Boolean): MediaSpecs {
+    override fun getMediaSpecs(url: String, preferredLocales: List<String>, force: Boolean): MediaSpecs {
 //        Log.d(TAG, "getMediaSpecs preferredLocales: ${preferredLocales.size}")
         val mediaSpecs = MediaSpecs()
-        val streamInfo = getStreamInfo(media.downloadUrl, force) ?: return mediaSpecs
+        val streamInfo = getStreamInfo(url, force) ?: return mediaSpecs
         var aSpecs = listOf<AudioSpec>()
         val audioStreams = streamInfo.audioStreams
         if (audioStreams != null) {
@@ -99,10 +99,10 @@ class UTurnProvider: Provider.Stub() {
         val cacheType = InfoCache.Type.STREAM
         return if (forceLoad) {
             CACHE.removeInfo(serviceId, url, cacheType)
-            try { StreamInfo.getInfo(npService, url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) } } catch (e: Exception) { null}
+            try { StreamInfo.getInfo(npService, url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) } } catch (e: Exception) { null }
         } else {
             val cachedData = CACHE.getFromKey(serviceId, url, cacheType) as? StreamInfo
-            cachedData ?: try { StreamInfo.getInfo(npService, url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) } } catch (e: Exception) { null}
+            cachedData ?: try { StreamInfo.getInfo(npService, url).also { info -> CACHE.putInfo(serviceId, url, info, cacheType) } } catch (e: Exception) { null }
         }
     }
 

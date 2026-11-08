@@ -116,10 +116,4 @@ object PoTokenProviderImpl : PoTokenProvider {
 //        Log.d(TAG, "poToken for $videoId: playerPot=$playerPot, streamingPot=$streamingPot, visitor_data=$visitorData")
         return PoTokenResult(visitorData, playerPot, streamingPot)
     }
-
-    override fun getWebEmbedClientPoToken(videoId: String): PoTokenResult? = null
-
-    override fun getAndroidClientPoToken(videoId: String): PoTokenResult? = null
-
-    override fun getIosClientPoToken(videoId: String): PoTokenResult? = null
 }
