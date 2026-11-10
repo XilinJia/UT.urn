@@ -1,20 +1,14 @@
 [versions]
 agp = "9.5.1"
-appcompat = "1.8.0"
-coreKtx = "1.19.1"
+kotlin = "2.4.21"
 kotlinxCoroutinesAndroid = "1.11.0"
 kotlinxDatetime = "0.8.0"
 ktorClient = "3.6.1"
-lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
-kotlin = "2.4.21"
 composeBom = "2026.09.00"
 webkit = "1.18.0"
 
 [libraries]
-androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -25,8 +19,6 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClient" }
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktorClient" }
-ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktorClient" }
-
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

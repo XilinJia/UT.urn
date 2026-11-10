@@ -1,0 +1,2 @@
+* NewPipeExtractor upped to 0.27.1
+* cleared unnecessary dependencies

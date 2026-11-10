@@ -1,6 +1,11 @@
+# 1.1.10
+
+* NewPipeExtractor upped to 0.27.1
+* cleared unnecessary dependencies
+
 # 1.1.9
 
-* NPEConnector upped to 1.1.10, NewPipeExtractor upped to 0.27.0
+* PodciniLib upped to 1.1.8, NPEConnector upped to 1.1.10, NewPipeExtractor upped to 0.27.0
 * AGP upped to 9.5.1
 
 # 1.1.8
