@@ -1,0 +1,3 @@
+* updated main screen message
+* NPEConnector upped to 1.1.10
+* minor dependencies update

@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,7 +19,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PodciniProviderTheme {
                 Box(modifier = Modifier.background(Color.Black).fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("UT.urn Installed. No need to launch it, just use it from Podcini.A", color = Color.Green)
+                    Text(stringResource(R.string.main_screen_message), color = Color.Green)
                 }
             }
         }

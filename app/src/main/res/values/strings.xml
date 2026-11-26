@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PodciniProvider</string>
+    <string name="main_screen_message">UT.urn Installed. This app does nothing and consumes no battery by itself. It only provides assistence to Podcini.A upon request. No need to launch it, just use it from Podcini.A. If your phone is more brutal, to avoid this getting frequently killed, depending on your phone\'s system, unrestrict this app from battery usage, or allow it from secondary launch and run in background.</string>
 </resources>
